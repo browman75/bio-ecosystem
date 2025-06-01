@@ -1,46 +1,31 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>海洋分區拖拉學習</title>
+  <title>海洋生態系配對練習</title>
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #e0f7fa;
-      text-align: center;
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
       margin: 0;
-      padding: 0;
+      padding: 20px;
+      text-align: center;
     }
 
-    h1 {
-      color: #00796b;
-      margin: 20px;
-    }
-
-    .instruction {
-      font-size: 1.1em;
-      margin-bottom: 15px;
-      color: #006064;
-    }
-
-    .main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .labels {
-      display: flex;
-      gap: 10px;
+    h2 {
       margin-bottom: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
+    }
+
+    .label-box {
+      margin-bottom: 20px;
     }
 
     .label {
-      padding: 10px 16px;
-      background-color: #4dd0e1;
-      color: white;
+      display: inline-block;
+      padding: 10px 15px;
+      margin: 8px;
+      background-color: #b2ebf2;
+      border: 1px solid #0097a7;
       border-radius: 8px;
       cursor: grab;
       font-weight: bold;
@@ -53,112 +38,117 @@
 
     .image-container img {
       width: 800px;
-      max-width: 95vw;
-      border: 3px solid #0097a7;
-      border-radius: 12px;
     }
 
     .dropzone {
       position: absolute;
       border: 2px dashed transparent;
       border-radius: 8px;
-      width: 120px;
-      height: 60px;
+      width: 100px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       color: #004d40;
-      pointer-events: auto;
       background-color: rgba(255, 255, 255, 0.6);
+      pointer-events: auto;
     }
 
-    .correct {
-      background-color: #a5d6a7;
+    .dropzone.correct {
+      background-color: rgba(129, 199, 132, 0.7); /* 綠色 */
     }
 
-    .wrong {
-      background-color: #ef9a9a;
+    .dropzone.wrong {
+      background-color: rgba(239, 83, 80, 0.6); /* 紅色 */
     }
 
-    /* 自行依圖位置調整這些 dropzone 的位置 */
-    #zone1 { top: 60px; left: 80px; }
-    #zone2 { top: 120px; left: 140px; }
-    #zone3 { top: 100px; left: 500px; }
-    #zone4 { top: 250px; left: 550px; }
+    .buttons {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 0 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #checkBtn {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    #homeBtn {
+      background-color: #607d8b;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <h1>海洋分區拖拉學習</h1>
-  <p class="instruction">請將下列區域名稱拖曳到正確的圖片位置</p>
+  <h2>海洋生態系配對練習</h2>
 
-  <div class="main">
-    <!-- 拖曳選項 -->
-    <div class="labels">
-      <div class="label" draggable="true" id="label1">潮間帶</div>
-      <div class="label" draggable="true" id="label2">近海區</div>
-      <div class="label" draggable="true" id="label3">大洋區上層</div>
-      <div class="label" draggable="true" id="label4">大洋區下層</div>
-    </div>
+  <div class="label-box">
+    <div class="label" draggable="true">潮間帶</div>
+    <div class="label" draggable="true">淺海區</div>
+    <div class="label" draggable="true">大洋區</div>
+    <div class="label" draggable="true">大洋透光區</div>
+    <div class="label" draggable="true">大洋無光區</div>
+    <div class="label" draggable="true">200 m</div>
+  </div>
 
-    <!-- 圖像及放置區 -->
-    <div class="image-container">
-      <img src="ocean_zones.png" alt="海洋分區圖">
+  <div class="image-container">
+    <img src="ocean_zones.png" alt="海洋生態系圖" />
 
-      <!-- 拖曳目標區塊（根據圖形位置手動調整） -->
-      <div class="dropzone" id="zone1" data-answer="潮間帶"></div>
-      <div class="dropzone" id="zone2" data-answer="近海區"></div>
-      <div class="dropzone" id="zone3" data-answer="大洋區上層"></div>
-      <div class="dropzone" id="zone4" data-answer="大洋區下層"></div>
-    </div>
+    <!-- 拖放區域 -->
+    <div class="dropzone" style="top: 80px; left: 80px;" data-answer="潮間帶"></div>
+    <div class="dropzone" style="top: 80px; left: 180px;" data-answer="淺海區"></div>
+    <div class="dropzone" style="top: 80px; left: 400px;" data-answer="大洋區"></div>
+    <div class="dropzone" style="top: 160px; left: 550px;" data-answer="大洋透光區"></div>
+    <div class="dropzone" style="top: 270px; left: 550px;" data-answer="大洋無光區"></div>
+    <div class="dropzone" style="top: 200px; left: 630px;" data-answer="200 m"></div>
+  </div>
+
+  <div class="buttons">
+    <button id="checkBtn">✅ 檢查答案</button>
+    <a href="index.html"><button id="homeBtn">🏠 返回首頁</button></a>
   </div>
 
   <script>
-    const labels = document.querySelectorAll('.label');
-    const dropzones = document.querySelectorAll('.dropzone');
+    const labels = document.querySelectorAll(".label");
+    const dropzones = document.querySelectorAll(".dropzone");
 
     labels.forEach(label => {
-      label.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('text/plain', label.textContent);
+      label.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", label.textContent);
       });
     });
 
     dropzones.forEach(zone => {
-      zone.addEventListener('dragover', e => {
+      zone.addEventListener("dragover", e => e.preventDefault());
+      zone.addEventListener("drop", e => {
         e.preventDefault();
-        zone.style.borderColor = '#26a69a';
+        const data = e.dataTransfer.getData("text/plain");
+        zone.textContent = data;
+        zone.dataset.userAnswer = data;
       });
+    });
 
-      zone.addEventListener('dragleave', e => {
-        zone.style.borderColor = 'transparent';
-      });
-
-      zone.addEventListener('drop', e => {
-        e.preventDefault();
-        const data = e.dataTransfer.getData('text/plain');
-        if (data === zone.dataset.answer) {
-          zone.textContent = data;
-          zone.classList.remove('wrong');
-          zone.classList.add('correct');
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      dropzones.forEach(zone => {
+        const correct = zone.dataset.answer;
+        const user = zone.dataset.userAnswer;
+        if (user === correct) {
+          zone.classList.add("correct");
+          zone.classList.remove("wrong");
         } else {
-          zone.textContent = data;
-          zone.classList.remove('correct');
-          zone.classList.add('wrong');
+          zone.classList.add("wrong");
+          zone.classList.remove("correct");
         }
-        zone.style.borderColor = 'transparent';
       });
     });
   </script>
-  <div style="text-align: center; margin-top: 50px;">
-      <a href="index.html" style="
-        display: inline-block;
-        padding: 12px 24px;
-        background-color: #4db6ac;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 16px;
-        ">🔙 返回首頁</a>
-    </div>
 </body>
 </html>
