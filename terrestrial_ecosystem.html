@@ -4,7 +4,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>陸域生態系統配對遊戲</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,18 +12,20 @@
             font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
         .feature-card {
             cursor: grab;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            touch-action: none; /* 防止觸摸設備上的默認行為 */
         }
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
         }
         .ecosystem-container {
-            min-height: 200px;
+            min-height: 120px;
             transition: all 0.3s ease;
         }
         .ecosystem-container.highlight {
@@ -38,6 +40,9 @@
         .dragging {
             opacity: 0.5;
             transform: scale(1.05);
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -55,125 +60,185 @@
             border-radius: 50%;
             pointer-events: none;
         }
+        
+        /* 左右布局樣式 */
+        .game-container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+        
+        .features-panel {
+            width: 40%;
+            overflow-y: auto;
+            padding: 1rem;
+            border-right: 2px solid #e2e8f0;
+        }
+        
+        .ecosystems-panel {
+            width: 60%;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        /* 適配iPad橫向模式 */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+            .game-container {
+                height: calc(100vh - 100px);
+            }
+            
+            .ecosystem-container {
+                min-height: 100px;
+            }
+        }
+        
+        /* 確保在小屏幕上垂直堆疊 */
+        @media (max-width: 767px) {
+            .game-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .features-panel, .ecosystems-panel {
+                width: 100%;
+            }
+            
+            .features-panel {
+                border-right: none;
+                border-bottom: 2px solid #e2e8f0;
+            }
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 text-center">
-            <h1 class="text-3xl font-bold">陸域生態系統配對遊戲</h1>
-            <p class="mt-2">將特徵拖拉到對應的生態系統中</p>
-        </div>
-
-        <div class="p-6">
+<body class="p-2 md:p-4">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-4 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold">陸域生態系統配對遊戲</h1>
+            <p class="mt-1">將特徵拖拉到對應的生態系統中</p>
+            
             <!-- 計分和計時區 -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="bg-blue-100 p-3 rounded-lg shadow flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="flex justify-center items-center mt-2 space-x-8">
+                <div class="bg-blue-100 p-2 rounded-lg shadow flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span class="font-bold text-blue-800">時間: <span id="timer">0:00</span></span>
                 </div>
                 
-                <div class="bg-green-100 p-3 rounded-lg shadow flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="bg-green-100 p-2 rounded-lg shadow flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span class="font-bold text-green-800">得分: <span id="score">0</span> / 24</span>
                 </div>
             </div>
+        </div>
 
-            <!-- 特徵卡片區 -->
-            <div id="features-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div class="col-span-1 md:col-span-3">
-                    <h2 class="text-xl font-bold mb-3 text-gray-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                        </svg>
-                        生態系統特徵
-                    </h2>
-                </div>
-                <div id="features" class="col-span-1 md:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                    <!-- 特徵卡片將在這裡動態生成 -->
+        <!-- 遊戲主體 - 左右布局 -->
+        <div class="game-container">
+            <!-- 左側 - 特徵卡片區 -->
+            <div class="features-panel">
+                <div id="features-container">
+                    <div class="mb-3">
+                        <h2 class="text-lg font-bold mb-2 text-gray-700 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                            </svg>
+                            生態系統特徵
+                        </h2>
+                    </div>
+                    <div id="features" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <!-- 特徵卡片將在這裡動態生成 -->
+                    </div>
                 </div>
             </div>
+            
+            <!-- 右側 - 生態系統區域 -->
+            <div class="ecosystems-panel">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- 左側 - 森林系統 -->
+                    <div class="md:col-span-1">
+                        <!-- 熱帶森林 -->
+                        <div class="ecosystem-section mb-3">
+                            <div class="bg-green-800 text-white p-2 rounded-t-lg flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                </svg>
+                                <h2 class="text-base font-bold">熱帶森林生態系統</h2>
+                            </div>
+                            <div id="tropical-forest" class="ecosystem-container bg-green-100 p-2 rounded-b-lg min-h-[120px] border-2 border-green-800" data-ecosystem="tropical-forest">
+                                <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                            </div>
+                        </div>
 
-            <!-- 生態系統區域 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- 熱帶森林 -->
-                <div class="ecosystem-section">
-                    <div class="bg-green-800 text-white p-3 rounded-t-lg flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                        </svg>
-                        <h2 class="text-lg font-bold">熱帶森林生態系統</h2>
-                    </div>
-                    <div id="tropical-forest" class="ecosystem-container bg-green-100 p-4 rounded-b-lg min-h-[250px] border-2 border-green-800" data-ecosystem="tropical-forest">
-                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
-                    </div>
-                </div>
+                        <!-- 溫帶森林 -->
+                        <div class="ecosystem-section mb-3">
+                            <div class="bg-emerald-700 text-white p-2 rounded-t-lg flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                </svg>
+                                <h2 class="text-base font-bold">溫帶森林生態系統</h2>
+                            </div>
+                            <div id="temperate-forest" class="ecosystem-container bg-emerald-100 p-2 rounded-b-lg min-h-[120px] border-2 border-emerald-700" data-ecosystem="temperate-forest">
+                                <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                            </div>
+                        </div>
 
-                <!-- 溫帶森林 -->
-                <div class="ecosystem-section">
-                    <div class="bg-emerald-700 text-white p-3 rounded-t-lg flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                        </svg>
-                        <h2 class="text-lg font-bold">溫帶森林生態系統</h2>
+                        <!-- 寒帶森林 -->
+                        <div class="ecosystem-section mb-3">
+                            <div class="bg-teal-700 text-white p-2 rounded-t-lg flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                </svg>
+                                <h2 class="text-base font-bold">寒帶森林生態系統</h2>
+                            </div>
+                            <div id="boreal-forest" class="ecosystem-container bg-teal-100 p-2 rounded-b-lg min-h-[120px] border-2 border-teal-700" data-ecosystem="boreal-forest">
+                                <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                            </div>
+                        </div>
                     </div>
-                    <div id="temperate-forest" class="ecosystem-container bg-emerald-100 p-4 rounded-b-lg min-h-[250px] border-2 border-emerald-700" data-ecosystem="temperate-forest">
-                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
-                    </div>
-                </div>
 
-                <!-- 寒帶森林 -->
-                <div class="ecosystem-section">
-                    <div class="bg-teal-700 text-white p-3 rounded-t-lg flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                        </svg>
-                        <h2 class="text-lg font-bold">寒帶森林生態系統</h2>
-                    </div>
-                    <div id="boreal-forest" class="ecosystem-container bg-teal-100 p-4 rounded-b-lg min-h-[250px] border-2 border-teal-700" data-ecosystem="boreal-forest">
-                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
-                    </div>
-                </div>
+                    <!-- 右側 - 其他系統 -->
+                    <div class="md:col-span-1">
+                        <!-- 草原 -->
+                        <div class="ecosystem-section mb-3">
+                            <div class="bg-yellow-700 text-white p-2 rounded-t-lg flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <h2 class="text-base font-bold">草原生態系統</h2>
+                            </div>
+                            <div id="grassland" class="ecosystem-container bg-yellow-100 p-2 rounded-b-lg min-h-[120px] border-2 border-yellow-700" data-ecosystem="grassland">
+                                <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                            </div>
+                        </div>
 
-                <!-- 草原 -->
-                <div class="ecosystem-section">
-                    <div class="bg-yellow-700 text-white p-3 rounded-t-lg flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                        <h2 class="text-lg font-bold">草原生態系統</h2>
-                    </div>
-                    <div id="grassland" class="ecosystem-container bg-yellow-100 p-4 rounded-b-lg min-h-[250px] border-2 border-yellow-700" data-ecosystem="grassland">
-                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
-                    </div>
-                </div>
+                        <!-- 沙漠 -->
+                        <div class="ecosystem-section mb-3">
+                            <div class="bg-amber-600 text-white p-2 rounded-t-lg flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <h2 class="text-base font-bold">沙漠生態系統</h2>
+                            </div>
+                            <div id="desert" class="ecosystem-container bg-amber-100 p-2 rounded-b-lg min-h-[120px] border-2 border-amber-600" data-ecosystem="desert">
+                                <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                            </div>
+                        </div>
 
-                <!-- 沙漠 -->
-                <div class="ecosystem-section">
-                    <div class="bg-amber-600 text-white p-3 rounded-t-lg flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                        <h2 class="text-lg font-bold">沙漠生態系統</h2>
-                    </div>
-                    <div id="desert" class="ecosystem-container bg-amber-100 p-4 rounded-b-lg min-h-[250px] border-2 border-amber-600" data-ecosystem="desert">
-                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
-                    </div>
-                </div>
-
-                <!-- 凍原 -->
-                <div class="ecosystem-section">
-                    <div class="bg-blue-700 text-white p-3 rounded-t-lg flex items-center">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                        <h2 class="text-lg font-bold">凍原生態系統</h2>
-                    </div>
-                    <div id="tundra" class="ecosystem-container bg-blue-100 p-4 rounded-b-lg min-h-[250px] border-2 border-blue-700" data-ecosystem="tundra">
-                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                        <!-- 凍原 -->
+                        <div class="ecosystem-section mb-3">
+                            <div class="bg-blue-700 text-white p-2 rounded-t-lg flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <h2 class="text-base font-bold">凍原生態系統</h2>
+                            </div>
+                            <div id="tundra" class="ecosystem-container bg-blue-100 p-2 rounded-b-lg min-h-[120px] border-2 border-blue-700" data-ecosystem="tundra">
+                                <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -182,13 +247,13 @@
 
     <!-- 結果彈窗 -->
     <div id="result-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl transform transition-all">
             <div class="text-center">
-                <div id="result-icon" class="mx-auto mb-4 text-6xl"></div>
+                <div id="result-icon" class="mx-auto mb-4 text-5xl"></div>
                 <h2 id="result-title" class="text-2xl font-bold mb-2"></h2>
-                <p id="result-message" class="text-gray-600 mb-6"></p>
-                <p id="completion-time" class="text-lg font-bold text-blue-600 mb-6"></p>
-                <div class="flex justify-center space-x-4">
+                <p id="result-message" class="text-gray-600 mb-4"></p>
+                <p id="completion-time" class="text-lg font-bold text-blue-600 mb-4"></p>
+                <div class="flex justify-center">
                     <button id="play-again" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
                         再玩一次
                     </button>
@@ -246,6 +311,8 @@
             let startTime;
             let timerInterval;
             let completionTime = "";
+            let dragOffsetX = 0;
+            let dragOffsetY = 0;
 
             // 初始化特徵卡片
             const featuresContainer = document.getElementById('features');
@@ -256,33 +323,30 @@
             // 創建特徵卡片
             shuffledFeatures.forEach(feature => {
                 const featureCard = document.createElement('div');
-                featureCard.className = 'feature-card bg-white p-3 rounded-lg shadow-md border-2 border-purple-300';
-                featureCard.setAttribute('draggable', 'true');
+                featureCard.className = 'feature-card bg-white p-2 rounded-lg shadow-md border-2 border-purple-300 mb-2';
                 featureCard.setAttribute('data-id', feature.id);
                 featureCard.setAttribute('data-ecosystem', feature.ecosystem);
                 featureCard.innerHTML = `
                     <p class="text-sm font-medium text-gray-700">${feature.text}</p>
                 `;
                 
-                // 拖拽事件
-                featureCard.addEventListener('dragstart', dragStart);
-                featureCard.addEventListener('dragend', dragEnd);
+                // 添加觸摸和鼠標事件
+                featureCard.addEventListener('mousedown', handleDragStart);
+                featureCard.addEventListener('touchstart', handleDragStart, {passive: false});
                 
                 featuresContainer.appendChild(featureCard);
             });
 
             // 初始化生態系統容器
             const ecosystemContainers = document.querySelectorAll('.ecosystem-container');
-            ecosystemContainers.forEach(container => {
-                container.addEventListener('dragover', dragOver);
-                container.addEventListener('dragenter', dragEnter);
-                container.addEventListener('dragleave', dragLeave);
-                container.addEventListener('drop', drop);
-            });
-
-            // 拖拽函數
-            function dragStart(e) {
+            
+            // 拖拽開始函數
+            function handleDragStart(e) {
                 if (isGameOver) return;
+                
+                // 阻止默認行為和事件冒泡
+                e.preventDefault();
+                e.stopPropagation();
                 
                 // 開始計時（如果尚未開始）
                 if (!timerStarted) {
@@ -290,60 +354,190 @@
                     timerStarted = true;
                 }
                 
+                // 獲取事件位置
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                // 設置拖拽項目
                 draggedItem = this;
-                setTimeout(() => {
-                    this.classList.add('dragging');
-                }, 0);
-            }
-
-            function dragEnd() {
-                this.classList.remove('dragging');
-            }
-
-            function dragOver(e) {
-                e.preventDefault();
-            }
-
-            function dragEnter(e) {
-                e.preventDefault();
-                this.classList.add('highlight');
-            }
-
-            function dragLeave() {
-                this.classList.remove('highlight');
-            }
-
-            function drop() {
-                this.classList.remove('highlight');
+                const rect = draggedItem.getBoundingClientRect();
                 
-                if (!draggedItem || isGameOver) return;
+                // 計算偏移量
+                dragOffsetX = clientX - rect.left;
+                dragOffsetY = clientY - rect.top;
                 
-                const targetEcosystem = this.getAttribute('data-ecosystem');
+                // 添加拖拽樣式
+                draggedItem.classList.add('dragging');
+                
+                // 添加全局事件監聽
+                document.addEventListener('mousemove', handleDragMove);
+                document.addEventListener('touchmove', handleDragMove, {passive: false});
+                document.addEventListener('mouseup', handleDragEnd);
+                document.addEventListener('touchend', handleDragEnd);
+            }
+
+            // 拖拽移動函數
+            function handleDragMove(e) {
+                if (!draggedItem) return;
+                
+                // 阻止默認行為和事件冒泡
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 獲取事件位置
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                // 更新拖拽項目位置
+                const newX = clientX - dragOffsetX;
+                const newY = clientY - dragOffsetY;
+                
+                // 限制在視口範圍內
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const cardWidth = draggedItem.offsetWidth;
+                const cardHeight = draggedItem.offsetHeight;
+                
+                const boundedX = Math.max(0, Math.min(newX, viewportWidth - cardWidth));
+                const boundedY = Math.max(0, Math.min(newY, viewportHeight - cardHeight));
+                
+                draggedItem.style.position = 'absolute';
+                draggedItem.style.left = `${boundedX}px`;
+                draggedItem.style.top = `${boundedY}px`;
+                draggedItem.style.zIndex = '1000';
+                
+                // 檢查是否在生態系統容器上方
+                checkDropTarget(clientX, clientY);
+            }
+
+            // 檢查拖放目標
+            function checkDropTarget(clientX, clientY) {
+                // 移除所有容器的高亮
+                ecosystemContainers.forEach(container => {
+                    container.classList.remove('highlight');
+                });
+                
+                // 檢查是否在任何容器上方
+                ecosystemContainers.forEach(container => {
+                    const rect = container.getBoundingClientRect();
+                    if (
+                        clientX >= rect.left &&
+                        clientX <= rect.right &&
+                        clientY >= rect.top &&
+                        clientY <= rect.bottom
+                    ) {
+                        container.classList.add('highlight');
+                    }
+                });
+            }
+
+            // 拖拽結束函數
+            function handleDragEnd(e) {
+                if (!draggedItem) return;
+                
+                // 移除全局事件監聽
+                document.removeEventListener('mousemove', handleDragMove);
+                document.removeEventListener('touchmove', handleDragMove);
+                document.removeEventListener('mouseup', handleDragEnd);
+                document.removeEventListener('touchend', handleDragEnd);
+                
+                // 獲取事件位置
+                const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+                const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+                
+                // 檢查是否在任何容器上方
+                let dropped = false;
+                
+                ecosystemContainers.forEach(container => {
+                    const rect = container.getBoundingClientRect();
+                    if (
+                        clientX >= rect.left &&
+                        clientX <= rect.right &&
+                        clientY >= rect.top &&
+                        clientY <= rect.bottom
+                    ) {
+                        // 放置到容器中
+                        dropToContainer(container);
+                        dropped = true;
+                    }
+                    
+                    // 移除高亮
+                    container.classList.remove('highlight');
+                });
+                
+                // 如果沒有放置到任何容器，則返回原位置
+                if (!dropped) {
+                    resetDraggedItem();
+                }
+            }
+
+            // 放置到容器
+            function dropToContainer(container) {
+                if (!draggedItem) return;
+                
+                const targetEcosystem = container.getAttribute('data-ecosystem');
                 const featureEcosystem = draggedItem.getAttribute('data-ecosystem');
                 
                 // 檢查是否正確
                 const isCorrect = targetEcosystem === featureEcosystem;
                 
-                // 移動卡片到目標容器
-                this.appendChild(draggedItem);
+                // 重置拖拽項目樣式
+                draggedItem.style.position = '';
+                draggedItem.style.left = '';
+                draggedItem.style.top = '';
+                draggedItem.style.zIndex = '';
+                draggedItem.classList.remove('dragging');
+                
+                // 移除之前的樣式
+                draggedItem.classList.remove('correct', 'incorrect');
                 
                 // 設置卡片樣式
-                draggedItem.classList.remove('dragging');
                 draggedItem.classList.add(isCorrect ? 'correct' : 'incorrect');
                 draggedItem.classList.add('pulse');
                 
+                // 移動卡片到目標容器
+                container.appendChild(draggedItem);
+                
                 // 更新分數
                 if (isCorrect) {
-                    score++;
-                    document.getElementById('score').textContent = score;
-                    createConfetti(draggedItem);
+                    // 如果之前沒有得分，現在才加分
+                    if (!draggedItem.hasAttribute('data-scored')) {
+                        score++;
+                        document.getElementById('score').textContent = score;
+                        createConfetti(draggedItem);
+                        draggedItem.setAttribute('data-scored', 'true');
+                    }
+                    
+                    // 移除拖拽功能
+                    draggedItem.removeEventListener('mousedown', handleDragStart);
+                    draggedItem.removeEventListener('touchstart', handleDragStart);
+                } else {
+                    // 如果放錯了，保留拖拽功能，允許重新拖拽
+                    // 如果之前得過分，現在要減分
+                    if (draggedItem.hasAttribute('data-scored')) {
+                        score--;
+                        document.getElementById('score').textContent = score;
+                        draggedItem.removeAttribute('data-scored');
+                    }
                 }
                 
-                // 檢查遊戲是否結束
+                // 檢查遊戲狀態
                 checkGameStatus();
                 
-                // 移除拖拽功能
-                draggedItem.setAttribute('draggable', 'false');
+                draggedItem = null;
+            }
+
+            // 重置拖拽項目
+            function resetDraggedItem() {
+                if (!draggedItem) return;
+                
+                // 重置樣式
+                draggedItem.style.position = '';
+                draggedItem.style.left = '';
+                draggedItem.style.top = '';
+                draggedItem.style.zIndex = '';
+                draggedItem.classList.remove('dragging');
+                
                 draggedItem = null;
             }
 
@@ -355,7 +549,7 @@
                 
                 const colors = ['#FF5252', '#FFEB3B', '#4CAF50', '#2196F3', '#9C27B0'];
                 
-                for (let i = 0; i < 20; i++) {
+                for (let i = 0; i < 15; i++) {
                     const confetti = document.createElement('div');
                     confetti.className = 'confetti';
                     confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
@@ -363,8 +557,8 @@
                     confetti.style.top = `${centerY}px`;
                     
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = Math.random() * 100 + 50;
-                    const animationDuration = Math.random() * 1 + 1;
+                    const distance = Math.random() * 80 + 40;
+                    const animationDuration = Math.random() * 1 + 0.5;
                     
                     confetti.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
                     
@@ -387,9 +581,6 @@
 
             // 檢查遊戲狀態
             function checkGameStatus() {
-                // 檢查是否所有卡片都已放置
-                const allPlaced = document.querySelectorAll('#features .feature-card').length === 0;
-                
                 if (score === 24) {
                     // 停止計時
                     if (timerStarted) {
@@ -401,8 +592,6 @@
                         completionTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
                     }
                     
-                    endGame();
-                } else if (allPlaced) {
                     endGame();
                 }
             }
@@ -464,8 +653,8 @@
             }
         });
     </script>
-    
-    <div style="text-align: center; margin-top: 50px;">
+
+<div style="text-align: center; margin-top: 50px;">
       <a href="index.html" style="
         display: inline-block;
         padding: 12px 24px;
@@ -476,12 +665,7 @@
         font-size: 16px;
         ">🔙 返回首頁</a>
     </div>
-    
-    <script>
-        (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'948ba476a76b4a8d',t:'MTc0ODc0ODczMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
-    </script>
-    
 
-    
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'948d9ae771458442',t:'MTc0ODc2OTMxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
