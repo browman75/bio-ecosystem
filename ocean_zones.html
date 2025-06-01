@@ -7,47 +7,38 @@
     body {
       font-family: sans-serif;
       background-color: #e0f7fa;
+      text-align: center;
       margin: 0;
       padding: 0;
-      text-align: center;
     }
 
     h1 {
       color: #00796b;
-      margin-top: 20px;
+      margin: 20px;
+    }
+
+    .instruction {
+      font-size: 1.1em;
+      margin-bottom: 15px;
+      color: #006064;
     }
 
     .main {
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 30px;
-      margin: 30px;
-      flex-wrap: wrap;
-    }
-
-    .image-box img {
-      width: 480px;
-      max-width: 100%;
-      border: 3px solid #0097a7;
-      border-radius: 12px;
-    }
-
-    .game-box {
-      display: flex;
       flex-direction: column;
-      gap: 20px;
-      max-width: 300px;
+      align-items: center;
     }
 
     .labels {
       display: flex;
-      flex-direction: column;
       gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .label {
-      padding: 10px;
+      padding: 10px 16px;
       background-color: #4dd0e1;
       color: white;
       border-radius: 8px;
@@ -55,65 +46,69 @@
       font-weight: bold;
     }
 
-    .dropzones {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+    .image-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .image-container img {
+      width: 800px;
+      max-width: 95vw;
+      border: 3px solid #0097a7;
+      border-radius: 12px;
     }
 
     .dropzone {
-      width: 100%;
-      height: 60px;
-      border: 2px dashed #00796b;
+      position: absolute;
+      border: 2px dashed transparent;
       border-radius: 8px;
-      background-color: #ffffff;
+      width: 120px;
+      height: 60px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      color: #555;
+      color: #004d40;
+      pointer-events: auto;
     }
 
     .correct {
-      background-color: #a5d6a7 !important;
+      background-color: #a5d6a7;
     }
 
     .wrong {
-      background-color: #ef9a9a !important;
+      background-color: #ef9a9a;
     }
 
-    .instruction {
-      font-size: 1.1em;
-      margin-top: 10px;
-      color: #006064;
-    }
+    /* 自行依圖位置調整這些 dropzone 的位置 */
+    #zone1 { top: 60px; left: 80px; }
+    #zone2 { top: 120px; left: 140px; }
+    #zone3 { top: 100px; left: 500px; }
+    #zone4 { top: 250px; left: 550px; }
   </style>
 </head>
 <body>
   <h1>海洋分區拖拉學習</h1>
-  <p class="instruction">請根據圖片，將「潮間帶、近海區、大洋區上層、大洋區下層」拖曳到正確的區域名稱框中</p>
+  <p class="instruction">請將下列區域名稱拖曳到正確的圖片位置</p>
 
   <div class="main">
-    <!-- 圖片區 -->
-    <div class="image-box">
-      <img src="ocean_zones.png" alt="海洋分區圖">
+    <!-- 拖曳選項 -->
+    <div class="labels">
+      <div class="label" draggable="true" id="label1">潮間帶</div>
+      <div class="label" draggable="true" id="label2">近海區</div>
+      <div class="label" draggable="true" id="label3">大洋區上層</div>
+      <div class="label" draggable="true" id="label4">大洋區下層</div>
     </div>
 
-    <!-- 拖曳互動區 -->
-    <div class="game-box">
-      <div class="labels">
-        <div class="label" draggable="true" id="label1">潮間帶</div>
-        <div class="label" draggable="true" id="label2">近海區</div>
-        <div class="label" draggable="true" id="label3">大洋區上層</div>
-        <div class="label" draggable="true" id="label4">大洋區下層</div>
-      </div>
+    <!-- 圖像及放置區 -->
+    <div class="image-container">
+      <img src="ocean_zones.png" alt="海洋分區圖">
 
-      <div class="dropzones">
-        <div class="dropzone" data-answer="潮間帶">區域 A</div>
-        <div class="dropzone" data-answer="近海區">區域 B</div>
-        <div class="dropzone" data-answer="大洋區上層">區域 C</div>
-        <div class="dropzone" data-answer="大洋區下層">區域 D</div>
-      </div>
+      <!-- 拖曳目標區塊（根據圖形位置手動調整） -->
+      <div class="dropzone" id="zone1" data-answer="潮間帶"></div>
+      <div class="dropzone" id="zone2" data-answer="近海區"></div>
+      <div class="dropzone" id="zone3" data-answer="大洋區上層"></div>
+      <div class="dropzone" id="zone4" data-answer="大洋區下層"></div>
     </div>
   </div>
 
@@ -130,11 +125,11 @@
     dropzones.forEach(zone => {
       zone.addEventListener('dragover', e => {
         e.preventDefault();
-        zone.style.backgroundColor = '#c8e6c9';
+        zone.style.borderColor = '#26a69a';
       });
 
       zone.addEventListener('dragleave', e => {
-        zone.style.backgroundColor = '';
+        zone.style.borderColor = 'transparent';
       });
 
       zone.addEventListener('drop', e => {
@@ -149,11 +144,10 @@
           zone.classList.remove('correct');
           zone.classList.add('wrong');
         }
-        zone.style.backgroundColor = '';
+        zone.style.borderColor = 'transparent';
       });
     });
   </script>
-
   <div style="text-align: center; margin-top: 50px;">
       <a href="index.html" style="
         display: inline-block;
@@ -164,6 +158,6 @@
         border-radius: 8px;
         font-size: 16px;
         ">🔙 返回首頁</a>
-  </div>
+    </div>
 </body>
 </html>
