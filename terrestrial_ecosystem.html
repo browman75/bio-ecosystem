@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陸域生態系統配對遊戲</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            min-height: 100vh;
+        }
+        .feature-card {
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        .ecosystem-container {
+            min-height: 200px;
+            transition: all 0.3s ease;
+        }
+        .ecosystem-container.highlight {
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+        .correct {
+            background-color: rgba(72, 187, 120, 0.2) !important;
+        }
+        .incorrect {
+            background-color: rgba(245, 101, 101, 0.2) !important;
+        }
+        .dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 0.5s;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 text-center">
+            <h1 class="text-3xl font-bold">陸域生態系統配對遊戲</h1>
+            <p class="mt-2">將特徵拖拉到對應的生態系統中</p>
+        </div>
+
+        <div class="p-6">
+            <!-- 計分和計時區 -->
+            <div class="flex justify-between items-center mb-6">
+                <div class="bg-blue-100 p-3 rounded-lg shadow flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-bold text-blue-800">時間: <span id="timer">0:00</span></span>
+                </div>
+                
+                <div class="bg-green-100 p-3 rounded-lg shadow flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-bold text-green-800">得分: <span id="score">0</span> / 24</span>
+                </div>
+            </div>
+
+            <!-- 特徵卡片區 -->
+            <div id="features-container" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="col-span-1 md:col-span-3">
+                    <h2 class="text-xl font-bold mb-3 text-gray-700 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                        </svg>
+                        生態系統特徵
+                    </h2>
+                </div>
+                <div id="features" class="col-span-1 md:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <!-- 特徵卡片將在這裡動態生成 -->
+                </div>
+            </div>
+
+            <!-- 生態系統區域 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 熱帶森林 -->
+                <div class="ecosystem-section">
+                    <div class="bg-green-800 text-white p-3 rounded-t-lg flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                        <h2 class="text-lg font-bold">熱帶森林生態系統</h2>
+                    </div>
+                    <div id="tropical-forest" class="ecosystem-container bg-green-100 p-4 rounded-b-lg min-h-[250px] border-2 border-green-800" data-ecosystem="tropical-forest">
+                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                    </div>
+                </div>
+
+                <!-- 溫帶森林 -->
+                <div class="ecosystem-section">
+                    <div class="bg-emerald-700 text-white p-3 rounded-t-lg flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                        <h2 class="text-lg font-bold">溫帶森林生態系統</h2>
+                    </div>
+                    <div id="temperate-forest" class="ecosystem-container bg-emerald-100 p-4 rounded-b-lg min-h-[250px] border-2 border-emerald-700" data-ecosystem="temperate-forest">
+                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                    </div>
+                </div>
+
+                <!-- 寒帶森林 -->
+                <div class="ecosystem-section">
+                    <div class="bg-teal-700 text-white p-3 rounded-t-lg flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                        </svg>
+                        <h2 class="text-lg font-bold">寒帶森林生態系統</h2>
+                    </div>
+                    <div id="boreal-forest" class="ecosystem-container bg-teal-100 p-4 rounded-b-lg min-h-[250px] border-2 border-teal-700" data-ecosystem="boreal-forest">
+                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                    </div>
+                </div>
+
+                <!-- 草原 -->
+                <div class="ecosystem-section">
+                    <div class="bg-yellow-700 text-white p-3 rounded-t-lg flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <h2 class="text-lg font-bold">草原生態系統</h2>
+                    </div>
+                    <div id="grassland" class="ecosystem-container bg-yellow-100 p-4 rounded-b-lg min-h-[250px] border-2 border-yellow-700" data-ecosystem="grassland">
+                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                    </div>
+                </div>
+
+                <!-- 沙漠 -->
+                <div class="ecosystem-section">
+                    <div class="bg-amber-600 text-white p-3 rounded-t-lg flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <h2 class="text-lg font-bold">沙漠生態系統</h2>
+                    </div>
+                    <div id="desert" class="ecosystem-container bg-amber-100 p-4 rounded-b-lg min-h-[250px] border-2 border-amber-600" data-ecosystem="desert">
+                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                    </div>
+                </div>
+
+                <!-- 凍原 -->
+                <div class="ecosystem-section">
+                    <div class="bg-blue-700 text-white p-3 rounded-t-lg flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <h2 class="text-lg font-bold">凍原生態系統</h2>
+                    </div>
+                    <div id="tundra" class="ecosystem-container bg-blue-100 p-4 rounded-b-lg min-h-[250px] border-2 border-blue-700" data-ecosystem="tundra">
+                        <!-- 拖放到這裡的特徵卡片將顯示在這裡 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 結果彈窗 -->
+    <div id="result-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="text-center">
+                <div id="result-icon" class="mx-auto mb-4 text-6xl"></div>
+                <h2 id="result-title" class="text-2xl font-bold mb-2"></h2>
+                <p id="result-message" class="text-gray-600 mb-6"></p>
+                <p id="completion-time" class="text-lg font-bold text-blue-600 mb-6"></p>
+                <div class="flex justify-center space-x-4">
+                    <button id="play-again" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                        再玩一次
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 特徵資料
+            const featureData = [
+                // 熱帶森林特徵
+                { id: 1, text: "年雨量2000毫米以上", ecosystem: "tropical-forest" },
+                { id: 2, text: "全年高溫多雨，氣候穩定", ecosystem: "tropical-forest" },
+                { id: 3, text: "樹木高大茂密，形成多層次冠層", ecosystem: "tropical-forest" },
+                { id: 4, text: "動物例子：猴子、樹蛙、豹", ecosystem: "tropical-forest" },
+                
+                // 溫帶森林特徵
+                { id: 5, text: "年雨量750-1500毫米", ecosystem: "temperate-forest" },
+                { id: 6, text: "四季分明，落葉與常綠樹種共存", ecosystem: "temperate-forest" },
+                { id: 7, text: "春季開花，秋季落葉", ecosystem: "temperate-forest" },
+                { id: 8, text: "動物例子：鹿、松鼠、啄木鳥", ecosystem: "temperate-forest" },
+                
+                // 寒帶森林特徵
+                { id: 9, text: "年雨量400-750毫米", ecosystem: "boreal-forest" },
+                { id: 10, text: "冬季漫長寒冷，夏季短暫", ecosystem: "boreal-forest" },
+                { id: 11, text: "以針葉樹為主，如松樹、杉樹", ecosystem: "boreal-forest" },
+                { id: 12, text: "動物例子：馴鹿、狼、熊", ecosystem: "boreal-forest" },
+                
+                // 草原特徵
+                { id: 13, text: "年雨量250~750毫米", ecosystem: "grassland" },
+                { id: 14, text: "以草本植物為主，很少有大型樹木", ecosystem: "grassland" },
+                { id: 15, text: "植物根系發達，能抵抗乾旱", ecosystem: "grassland" },
+                { id: 16, text: "動物例子：羚羊、野牛、草原獅", ecosystem: "grassland" },
+                
+                // 沙漠特徵
+                { id: 17, text: "年雨量250毫米以下", ecosystem: "desert" },
+                { id: 18, text: "晝夜溫差大，日間炎熱夜間寒冷", ecosystem: "desert" },
+                { id: 19, text: "植物根系廣而淺，能充分吸收短暫降雨的水分", ecosystem: "desert" },
+                { id: 20, text: "動物例子：駱駝、蜥蜴、沙漠狐", ecosystem: "desert" },
+                
+                // 凍原特徵
+                { id: 21, text: "年雨量少，多為雪", ecosystem: "tundra" },
+                { id: 22, text: "土壤下方有永久凍土層", ecosystem: "tundra" },
+                { id: 23, text: "植物矮小，以苔蘚、地衣為主", ecosystem: "tundra" },
+                { id: 24, text: "動物例子：北極熊、麝牛、北極狐", ecosystem: "tundra" }
+            ];
+
+            // 遊戲狀態
+            let score = 0;
+            let draggedItem = null;
+            let isGameOver = false;
+            let timerStarted = false;
+            let startTime;
+            let timerInterval;
+            let completionTime = "";
+
+            // 初始化特徵卡片
+            const featuresContainer = document.getElementById('features');
+            
+            // 打亂特徵順序
+            const shuffledFeatures = [...featureData].sort(() => Math.random() - 0.5);
+            
+            // 創建特徵卡片
+            shuffledFeatures.forEach(feature => {
+                const featureCard = document.createElement('div');
+                featureCard.className = 'feature-card bg-white p-3 rounded-lg shadow-md border-2 border-purple-300';
+                featureCard.setAttribute('draggable', 'true');
+                featureCard.setAttribute('data-id', feature.id);
+                featureCard.setAttribute('data-ecosystem', feature.ecosystem);
+                featureCard.innerHTML = `
+                    <p class="text-sm font-medium text-gray-700">${feature.text}</p>
+                `;
+                
+                // 拖拽事件
+                featureCard.addEventListener('dragstart', dragStart);
+                featureCard.addEventListener('dragend', dragEnd);
+                
+                featuresContainer.appendChild(featureCard);
+            });
+
+            // 初始化生態系統容器
+            const ecosystemContainers = document.querySelectorAll('.ecosystem-container');
+            ecosystemContainers.forEach(container => {
+                container.addEventListener('dragover', dragOver);
+                container.addEventListener('dragenter', dragEnter);
+                container.addEventListener('dragleave', dragLeave);
+                container.addEventListener('drop', drop);
+            });
+
+            // 拖拽函數
+            function dragStart(e) {
+                if (isGameOver) return;
+                
+                // 開始計時（如果尚未開始）
+                if (!timerStarted) {
+                    startTimer();
+                    timerStarted = true;
+                }
+                
+                draggedItem = this;
+                setTimeout(() => {
+                    this.classList.add('dragging');
+                }, 0);
+            }
+
+            function dragEnd() {
+                this.classList.remove('dragging');
+            }
+
+            function dragOver(e) {
+                e.preventDefault();
+            }
+
+            function dragEnter(e) {
+                e.preventDefault();
+                this.classList.add('highlight');
+            }
+
+            function dragLeave() {
+                this.classList.remove('highlight');
+            }
+
+            function drop() {
+                this.classList.remove('highlight');
+                
+                if (!draggedItem || isGameOver) return;
+                
+                const targetEcosystem = this.getAttribute('data-ecosystem');
+                const featureEcosystem = draggedItem.getAttribute('data-ecosystem');
+                
+                // 檢查是否正確
+                const isCorrect = targetEcosystem === featureEcosystem;
+                
+                // 移動卡片到目標容器
+                this.appendChild(draggedItem);
+                
+                // 設置卡片樣式
+                draggedItem.classList.remove('dragging');
+                draggedItem.classList.add(isCorrect ? 'correct' : 'incorrect');
+                draggedItem.classList.add('pulse');
+                
+                // 更新分數
+                if (isCorrect) {
+                    score++;
+                    document.getElementById('score').textContent = score;
+                    createConfetti(draggedItem);
+                }
+                
+                // 檢查遊戲是否結束
+                checkGameStatus();
+                
+                // 移除拖拽功能
+                draggedItem.setAttribute('draggable', 'false');
+                draggedItem = null;
+            }
+
+            // 創建彩色碎片效果
+            function createConfetti(element) {
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                const colors = ['#FF5252', '#FFEB3B', '#4CAF50', '#2196F3', '#9C27B0'];
+                
+                for (let i = 0; i < 20; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = `${centerX}px`;
+                    confetti.style.top = `${centerY}px`;
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 100 + 50;
+                    const animationDuration = Math.random() * 1 + 1;
+                    
+                    confetti.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // 動畫
+                    setTimeout(() => {
+                        confetti.style.transition = `all ${animationDuration}s ease-out`;
+                        confetti.style.left = `${centerX + Math.cos(angle) * distance}px`;
+                        confetti.style.top = `${centerY + Math.sin(angle) * distance}px`;
+                        confetti.style.opacity = '0';
+                        
+                        // 移除元素
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, animationDuration * 1000);
+                    }, 10);
+                }
+            }
+
+            // 檢查遊戲狀態
+            function checkGameStatus() {
+                // 檢查是否所有卡片都已放置
+                const allPlaced = document.querySelectorAll('#features .feature-card').length === 0;
+                
+                if (score === 24) {
+                    // 停止計時
+                    if (timerStarted) {
+                        clearInterval(timerInterval);
+                        const endTime = new Date();
+                        const timeDiff = endTime - startTime; // 毫秒
+                        const minutes = Math.floor(timeDiff / 60000);
+                        const seconds = ((timeDiff % 60000) / 1000).toFixed(0);
+                        completionTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    }
+                    
+                    endGame();
+                } else if (allPlaced) {
+                    endGame();
+                }
+            }
+
+            // 結束遊戲
+            function endGame() {
+                isGameOver = true;
+                
+                const resultModal = document.getElementById('result-modal');
+                const resultTitle = document.getElementById('result-title');
+                const resultMessage = document.getElementById('result-message');
+                const resultIcon = document.getElementById('result-icon');
+                const completionTimeElement = document.getElementById('completion-time');
+                
+                // 設置結果訊息
+                if (score === 24) {
+                    resultTitle.textContent = '完美！';
+                    resultMessage.textContent = '你獲得了滿分！太棒了！';
+                    resultIcon.textContent = '🏆';
+                    completionTimeElement.textContent = `完成時間: ${completionTime}`;
+                } else if (score >= 18) {
+                    resultTitle.textContent = '太棒了！';
+                    resultMessage.textContent = `你獲得了 ${score} 分！再接再厲！`;
+                    resultIcon.textContent = '🌟';
+                    completionTimeElement.textContent = '';
+                } else if (score >= 12) {
+                    resultTitle.textContent = '不錯的嘗試！';
+                    resultMessage.textContent = `你獲得了 ${score} 分。繼續努力！`;
+                    resultIcon.textContent = '👍';
+                    completionTimeElement.textContent = '';
+                } else {
+                    resultTitle.textContent = '再試一次！';
+                    resultMessage.textContent = `你獲得了 ${score} 分。別灰心，再來一局吧！`;
+                    resultIcon.textContent = '🔄';
+                    completionTimeElement.textContent = '';
+                }
+                
+                resultModal.classList.remove('hidden');
+            }
+
+            // 再玩一次
+            document.getElementById('play-again').addEventListener('click', function() {
+                location.reload();
+            });
+
+            // 開始計時器
+            function startTimer() {
+                startTime = new Date();
+                
+                timerInterval = setInterval(function() {
+                    const now = new Date();
+                    const timeDiff = now - startTime; // 毫秒
+                    const minutes = Math.floor(timeDiff / 60000);
+                    const seconds = ((timeDiff % 60000) / 1000).toFixed(0);
+                    
+                    document.getElementById('timer').textContent = 
+                        `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }, 1000);
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'948ba476a76b4a8d',t:'MTc0ODc0ODczMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,1197 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水域生態系配對遊戲</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+        }
+        
+        .draggable {
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        .droppable {
+            transition: all 0.3s;
+            min-height: 150px;
+        }
+        
+        .droppable.highlight {
+            box-shadow: 0 0 10px 3px rgba(59, 130, 246, 0.7);
+        }
+        
+        .correct {
+            background-color: rgba(52, 211, 153, 0.2);
+            border-color: #34D399 !important;
+        }
+        
+        .incorrect {
+            background-color: rgba(248, 113, 113, 0.2);
+            border-color: #F87171 !important;
+        }
+        
+        .ecosystem-card {
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
+            height: 18px; /* 更小的高度 */
+            padding: 14px 8px; /* 調整內邊距 */
+            flex: 0 0 auto;
+        }
+        
+        .ecosystem-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px -3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            transition: all 0.3s;
+        }
+        
+        .ecosystem-card:hover .card-overlay {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .info-card {
+            height: 100%;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 3s ease-in infinite;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .upstream-bg {
+            background: linear-gradient(to bottom, #72B5E8, #5A92B5);
+        }
+        
+        .downstream-bg {
+            background: linear-gradient(to bottom, #89CFF0, #4A89C0);
+        }
+        
+        .lake-bg {
+            background: linear-gradient(to bottom, #80B3E6, #6BA5D9);
+        }
+        
+        .pond-bg {
+            background: linear-gradient(to bottom, #92C9E6, #78B3D9);
+        }
+        
+        .estuary-bg {
+            background: linear-gradient(to bottom, #89B9D9, #3A7192);
+        }
+        
+        .intertidal-bg {
+            background: linear-gradient(to bottom, #4A8CC2, #003C67);
+        }
+        
+        .nearshore-bg {
+            background: linear-gradient(to bottom, #297AB3, #004A77);
+        }
+        
+        .pelagic-upper-bg {
+            background: linear-gradient(to bottom, #186A9F, #004A77);
+        }
+        
+        .pelagic-lower-bg {
+            background: linear-gradient(to bottom, #003A63, #001A3B);
+        }
+        
+        /* 調整生態系統按鈕的大小和可見度 */
+        .ecosystem-name {
+            font-size: 14px; /* 更小的字體大小 */
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 水平滾動容器 */
+        .ecosystems-container {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(59, 130, 246, 0.5) transparent;
+        }
+        
+        .ecosystems-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .ecosystems-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .ecosystems-container::-webkit-scrollbar-thumb {
+            background-color: rgba(59, 130, 246, 0.5);
+            border-radius: 20px;
+        }
+        
+        /* 計時器樣式 */
+        .timer {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 5px 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .timer-icon {
+            margin-right: 5px;
+        }
+        
+        .completed-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #10B981;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 拖曳時的克隆元素樣式 */
+        .drag-clone {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.8;
+            transform: translate(-50%, -50%);
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-2">水域生態系配對學習遊戲</h1>
+            <p class="text-lg text-blue-800">將不同的水域生態系與其環境條件、生產者和消費者進行配對</p>
+            
+            <!-- 計時器 -->
+            <div class="mt-3 flex justify-center">
+                <div class="timer">
+                    <span class="timer-icon">⏱️</span>
+                    <span id="timer">00:00</span>
+                </div>
+                
+                <!-- 完成進度 -->
+                <div class="ml-4 bg-white bg-opacity-80 rounded-lg px-3 py-1 shadow">
+                    完成進度: <span id="progress-count">0</span>/9
+                </div>
+            </div>
+        </header>
+        
+        <!-- 水域生態系統選擇區 - 單行排列在頂部 -->
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-blue-900 mb-2">水域生態系統</h2>
+            <div class="ecosystems-container" id="ecosystems">
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer upstream-bg shadow-md mx-1 relative" data-id="upstream">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">淡水河川上游</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer downstream-bg shadow-md mx-1 relative" data-id="downstream">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">淡水河川下游</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer lake-bg shadow-md mx-1 relative" data-id="lake">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">淡水湖泊</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer pond-bg shadow-md mx-1 relative" data-id="pond">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">淡水池塘</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer estuary-bg shadow-md mx-1 relative" data-id="estuary">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">河口</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer intertidal-bg shadow-md mx-1 relative" data-id="intertidal">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">海水潮間帶</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer nearshore-bg shadow-md mx-1 relative" data-id="nearshore">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">海水近海區</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer pelagic-upper-bg shadow-md mx-1 relative" data-id="pelagic_upper">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">海水遠洋區上層</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+                
+                <div class="ecosystem-card rounded-lg overflow-hidden cursor-pointer pelagic-lower-bg shadow-md mx-1 relative" data-id="pelagic_lower">
+                    <div class="card-overlay h-full w-full flex items-center justify-center">
+                        <h3 class="ecosystem-name">海水遠洋區下層</h3>
+                    </div>
+                    <div class="completed-badge hidden">✓</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- 右側配對區域 -->
+            <div class="w-full">
+                <div class="bg-white rounded-lg p-6 shadow-lg mb-6">
+                    <h2 class="text-xl font-bold text-blue-900 mb-4" id="selected-ecosystem">請選擇一個水域生態系統</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="matching-area">
+                        <!-- 環境條件區域 -->
+                        <div class="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
+                            <h3 class="font-bold text-blue-800 mb-2">環境條件</h3>
+                            <div class="droppable min-h-[150px] bg-white rounded p-3 border border-dashed border-blue-300" data-type="environment"></div>
+                        </div>
+                        
+                        <!-- 生產者區域 -->
+                        <div class="bg-green-50 rounded-lg p-4 border-2 border-green-200">
+                            <h3 class="font-bold text-green-800 mb-2">生產者</h3>
+                            <div class="droppable min-h-[150px] bg-white rounded p-3 border border-dashed border-green-300" data-type="producer"></div>
+                        </div>
+                        
+                        <!-- 消費者區域 -->
+                        <div class="bg-amber-50 rounded-lg p-4 border-2 border-amber-200">
+                            <h3 class="font-bold text-amber-800 mb-2">消費者</h3>
+                            <div class="droppable min-h-[150px] bg-white rounded p-3 border border-dashed border-amber-300" data-type="consumer"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 選項區域 -->
+                <div class="bg-white rounded-lg p-6 shadow-lg">
+                    <h2 class="text-xl font-bold text-blue-900 mb-4">拖曳下列選項到對應區域</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="options-area">
+                        <!-- 選項會在這裡動態生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 結果顯示 -->
+        <div id="result-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                <h2 class="text-2xl font-bold text-blue-900 mb-4" id="result-title">恭喜！</h2>
+                <p class="text-lg mb-6" id="result-message">你已成功完成配對！</p>
+                <div class="flex justify-between">
+                    <button id="try-again-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                        再試一次
+                    </button>
+                    <button id="next-ecosystem-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">
+                        下一個生態系
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 全部完成模態框 -->
+        <div id="complete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                <h2 class="text-2xl font-bold text-blue-900 mb-4">恭喜完成所有配對！</h2>
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <p class="text-lg text-center">你的完成時間</p>
+                    <p class="text-3xl font-bold text-blue-800 text-center" id="final-time">00:00</p>
+                </div>
+                <p class="mb-6">你已成功完成所有9個水域生態系統的配對！</p>
+                <div class="flex justify-center">
+                    <button id="restart-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                        重新開始
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 資訊模態框 -->
+        <div id="info-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-blue-900" id="info-title">水域生態系統資訊</h2>
+                    <button id="close-info-btn" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="info-content" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- 資訊內容會在這裡動態生成 -->
+                </div>
+                <div class="mt-6 text-center">
+                    <button id="info-close-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                        關閉
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 幫助按鈕 -->
+        <button id="help-btn" class="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 生態系統資料
+            const ecosystemData = {
+                upstream: {
+                    name: "淡水河川上游",
+                    environment: {
+                        text: "水的鹹度：淡水<br>地形：山區、坡度大<br>流動性：水流湍急",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：附著性藻類<br>生產者特色：能牢固附著在石頭上，抵抗水流沖刷",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：鮭魚、鱒魚、石蚯蚓<br>消費者特色：身體扁平或流線型，能抵抗強水流",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                downstream: {
+                    name: "淡水河川下游",
+                    environment: {
+                        text: "水的鹹度：淡水<br>地形：平原、坡度小<br>流動性：水流緩慢",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：浮游植物、水生植物<br>生產者特色：在緩慢流動的水中生長，根部固定在底泥",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：鯉魚、鯰魚、蝦類<br>消費者特色：適應低氧環境，以底泥中有機物為食",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                lake: {
+                    name: "淡水湖泊",
+                    environment: {
+                        text: "水的鹹度：淡水<br>地形：盆地<br>流動性：水體靜止，有季節性溫度分層",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：浮游植物、沉水植物、挺水植物<br>生產者特色：分布於不同水深，形成分層生態系",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：各種淡水魚類、兩棲類、水鳥<br>消費者特色：形成複雜食物網，適應不同水層生活",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                pond: {
+                    name: "淡水池塘",
+                    environment: {
+                        text: "水的鹹度：淡水<br>地形：淺盆地<br>流動性：水體靜止，易受環境變化影響",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：藻類、浮葉植物、挺水植物<br>生產者特色：適應淺水環境，生長迅速",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：蝌蚪、水生昆蟲、小型魚類<br>消費者特色：生命週期短，繁殖快，適應季節性變化",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                estuary: {
+                    name: "河口",
+                    environment: {
+                        text: "水的鹹度：混合區(淡鹹水交界)<br>地形：河流與海洋交界處<br>流動性：受潮汐影響，鹽度變化大",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：鹽沼植物、紅樹林、浮游植物<br>生產者特色：耐鹽性強，能適應鹽度變化",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：蟹類、貝類、鷺鷥<br>消費者特色：耐受鹽度變化，多為洄游性或季節性出現",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                intertidal: {
+                    name: "海水潮間帶",
+                    environment: {
+                        text: "水的鹹度：海水<br>地形：海岸線<br>流動性：受潮汐影響，定期暴露於空氣中",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：海藻、海草<br>生產者特色：能忍受乾濕交替、強光和鹽度變化",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：貽貝、藤壺、海星<br>消費者特色：有堅硬外殼或黏附能力，抵抗浪潮沖刷",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                nearshore: {
+                    name: "海水近海區",
+                    environment: {
+                        text: "水的鹹度：海水<br>地形：大陸棚<br>流動性：受海流影響，光照充足",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：浮游植物、大型海藻<br>生產者特色：光合作用效率高，是海洋初級生產力主要來源",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：沙丁魚、鯖魚、海豚<br>消費者特色：形成大型魚群，進行季節性遷徙",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                pelagic_upper: {
+                    name: "海水遠洋區上層",
+                    environment: {
+                        text: "水的鹹度：海水<br>地形：深海上層<br>流動性：受大洋環流影響，有光照",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：浮游植物<br>生產者特色：體型微小，數量龐大，分布廣泛",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：鮪魚、鯊魚、鯨魚<br>消費者特色：大型掠食者，游泳能力強，遷徙範圍廣",
+                        correct: true,
+                        type: "consumer"
+                    }
+                },
+                pelagic_lower: {
+                    name: "海水遠洋區下層",
+                    environment: {
+                        text: "水的鹹度：海水<br>地形：深海底層<br>流動性：水流緩慢，無光照，高壓力",
+                        correct: true,
+                        type: "environment"
+                    },
+                    producer: {
+                        text: "生產者種類：幾乎無光合生產者<br>生產者特色：依賴上層沉降的有機物或化能合成細菌",
+                        correct: true,
+                        type: "producer"
+                    },
+                    consumer: {
+                        text: "消費者例子：深海魚類、巨型魷魚<br>消費者特色：體型奇特，多有發光器官，適應高壓黑暗環境",
+                        correct: true,
+                        type: "consumer"
+                    }
+                }
+            };
+            
+            // 錯誤選項
+            const wrongOptions = [
+                {
+                    type: "environment",
+                    text: "水的鹹度：高鹽度<br>地形：珊瑚礁<br>流動性：受季風影響",
+                    correct: false
+                },
+                {
+                    type: "environment",
+                    text: "水的鹹度：中度鹹水<br>地形：沙質海床<br>流動性：強烈潮汐",
+                    correct: false
+                },
+                {
+                    type: "environment",
+                    text: "水的鹹度：微鹹水<br>地形：泥炭沼澤<br>流動性：季節性乾涸",
+                    correct: false
+                },
+                {
+                    type: "producer",
+                    text: "生產者種類：熱帶雨林植物<br>生產者特色：高大喬木，形成多層次冠層",
+                    correct: false
+                },
+                {
+                    type: "producer",
+                    text: "生產者種類：沙漠植物<br>生產者特色：肉質莖，減少水分蒸發",
+                    correct: false
+                },
+                {
+                    type: "producer",
+                    text: "生產者種類：苔蘚植物<br>生產者特色：無根系，直接從空氣吸收水分",
+                    correct: false
+                },
+                {
+                    type: "consumer",
+                    text: "消費者例子：鷹、狼、獅子<br>消費者特色：陸地頂級掠食者，領地性強",
+                    correct: false
+                },
+                {
+                    type: "consumer",
+                    text: "消費者例子：蝴蝶、蜜蜂<br>消費者特色：授粉者，與植物共同演化",
+                    correct: false
+                },
+                {
+                    type: "consumer",
+                    text: "消費者例子：蚯蚓、真菌<br>消費者特色：分解者，將有機物轉化為無機物",
+                    correct: false
+                }
+            ];
+            
+            let currentEcosystem = null;
+            let currentOptions = [];
+            let completedEcosystems = [];
+            let draggedElement = null;
+            let dragClone = null;
+            
+            // 計時器變數
+            let timerStarted = false;
+            let startTime = 0;
+            let timerInterval = null;
+            let totalTime = 0;
+            
+            // 初始化生態系統選擇
+            initEcosystemSelection();
+            
+            // 初始化幫助按鈕
+            document.getElementById('help-btn').addEventListener('click', showInfoModal);
+            document.getElementById('close-info-btn').addEventListener('click', hideInfoModal);
+            document.getElementById('info-close-btn').addEventListener('click', hideInfoModal);
+            
+            // 初始化結果模態框按鈕
+            document.getElementById('try-again-btn').addEventListener('click', function() {
+                hideResultModal();
+                setupMatchingGame(currentEcosystem);
+            });
+            
+            document.getElementById('next-ecosystem-btn').addEventListener('click', function() {
+                hideResultModal();
+                selectNextEcosystem();
+            });
+            
+            // 初始化重新開始按鈕
+            document.getElementById('restart-btn').addEventListener('click', function() {
+                hideCompleteModal();
+                resetGame();
+            });
+            
+            // 初始化生態系統選擇
+            function initEcosystemSelection() {
+                const ecosystems = document.querySelectorAll('#ecosystems .ecosystem-card');
+                ecosystems.forEach(ecosystem => {
+                    ecosystem.addEventListener('click', function() {
+                        const ecosystemId = this.dataset.id;
+                        selectEcosystem(ecosystemId);
+                    });
+                });
+            }
+            
+            // 選擇生態系統
+            function selectEcosystem(ecosystemId) {
+                currentEcosystem = ecosystemId;
+                
+                // 更新選中的生態系統顯示
+                document.getElementById('selected-ecosystem').textContent = ecosystemData[ecosystemId].name;
+                
+                // 設置配對遊戲
+                setupMatchingGame(ecosystemId);
+                
+                // 高亮顯示選中的生態系統
+                const ecosystems = document.querySelectorAll('#ecosystems .ecosystem-card');
+                ecosystems.forEach(eco => {
+                    if (eco.dataset.id === ecosystemId) {
+                        eco.classList.add('ring-2', 'ring-blue-500');
+                    } else {
+                        eco.classList.remove('ring-2', 'ring-blue-500');
+                    }
+                });
+            }
+            
+            // 設置配對遊戲
+            function setupMatchingGame(ecosystemId) {
+                // 清空配對區域
+                const dropZones = document.querySelectorAll('.droppable');
+                dropZones.forEach(zone => {
+                    zone.innerHTML = '';
+                    zone.classList.remove('correct', 'incorrect');
+                });
+                
+                // 準備選項
+                prepareOptions(ecosystemId);
+                
+                // 初始化拖放功能
+                initDragAndDrop();
+            }
+            
+            // 準備選項
+            function prepareOptions(ecosystemId) {
+                const optionsArea = document.getElementById('options-area');
+                optionsArea.innerHTML = '';
+                
+                // 獲取正確選項
+                const correctOptions = [
+                    ecosystemData[ecosystemId].environment,
+                    ecosystemData[ecosystemId].producer,
+                    ecosystemData[ecosystemId].consumer
+                ];
+                
+                // 隨機選擇6個錯誤選項
+                const shuffledWrongOptions = [...wrongOptions].sort(() => 0.5 - Math.random()).slice(0, 6);
+                
+                // 合併並打亂所有選項
+                currentOptions = [...correctOptions, ...shuffledWrongOptions].sort(() => 0.5 - Math.random());
+                
+                // 創建選項元素
+                currentOptions.forEach((option, index) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'draggable p-3 rounded shadow bg-white border border-gray-200 cursor-grab';
+                    optionElement.innerHTML = option.text;
+                    optionElement.dataset.index = index;
+                    optionElement.dataset.type = option.type;
+                    optionElement.dataset.correct = option.correct;
+                    
+                    // 根據類型添加顏色
+                    if (option.type === 'environment') {
+                        optionElement.classList.add('border-blue-300', 'hover:bg-blue-50');
+                    } else if (option.type === 'producer') {
+                        optionElement.classList.add('border-green-300', 'hover:bg-green-50');
+                    } else if (option.type === 'consumer') {
+                        optionElement.classList.add('border-amber-300', 'hover:bg-amber-50');
+                    }
+                    
+                    optionsArea.appendChild(optionElement);
+                });
+            }
+            
+            // 初始化拖放功能
+            function initDragAndDrop() {
+                const draggables = document.querySelectorAll('.draggable');
+                
+                draggables.forEach(draggable => {
+                    // 滑鼠事件
+                    draggable.addEventListener('mousedown', function(e) {
+                        // 如果是第一次拖曳，開始計時
+                        startTimerIfNeeded();
+                        
+                        draggedElement = this;
+                        
+                        // 創建拖曳時的克隆元素
+                        createDragClone(this, e.clientX, e.clientY);
+                        
+                        // 添加滑鼠移動和釋放事件
+                        document.addEventListener('mousemove', mouseMoveHandler);
+                        document.addEventListener('mouseup', mouseUpHandler);
+                        
+                        // 防止文字被選中
+                        e.preventDefault();
+                    });
+                    
+                    // 觸摸事件
+                    draggable.addEventListener('touchstart', function(e) {
+                        // 如果是第一次拖曳，開始計時
+                        startTimerIfNeeded();
+                        
+                        draggedElement = this;
+                        
+                        const touch = e.touches[0];
+                        createDragClone(this, touch.clientX, touch.clientY);
+                        
+                        // 防止頁面滾動
+                        e.preventDefault();
+                    });
+                    
+                    draggable.addEventListener('touchmove', function(e) {
+                        if (dragClone) {
+                            const touch = e.touches[0];
+                            updateDragClonePosition(touch.clientX, touch.clientY);
+                            
+                            // 檢查是否在可放置區域上方
+                            const elementAtPoint = document.elementFromPoint(touch.clientX, touch.clientY);
+                            highlightDropZone(elementAtPoint);
+                            
+                            // 防止頁面滾動
+                            e.preventDefault();
+                        }
+                    });
+                    
+                    draggable.addEventListener('touchend', function(e) {
+                        if (dragClone) {
+                            const touch = e.changedTouches[0];
+                            const elementAtPoint = document.elementFromPoint(touch.clientX, touch.clientY);
+                            
+                            handleDrop(elementAtPoint);
+                            removeDragClone();
+                        }
+                    });
+                });
+            }
+            
+            // 滑鼠移動處理
+            function mouseMoveHandler(e) {
+                if (dragClone) {
+                    updateDragClonePosition(e.clientX, e.clientY);
+                    
+                    // 檢查是否在可放置區域上方
+                    const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+                    highlightDropZone(elementAtPoint);
+                }
+            }
+            
+            // 滑鼠釋放處理
+            function mouseUpHandler(e) {
+                if (dragClone) {
+                    const elementAtPoint = document.elementFromPoint(e.clientX, e.clientY);
+                    handleDrop(elementAtPoint);
+                    removeDragClone();
+                }
+                
+                // 移除事件監聽器
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', mouseUpHandler);
+            }
+            
+            // 創建拖曳時的克隆元素
+            function createDragClone(element, x, y) {
+                // 移除可能存在的舊克隆元素
+                removeDragClone();
+                
+                // 創建新的克隆元素
+                dragClone = element.cloneNode(true);
+                dragClone.classList.add('drag-clone');
+                dragClone.style.width = element.offsetWidth + 'px';
+                
+                // 添加到文檔中
+                document.body.appendChild(dragClone);
+                
+                // 設置初始位置
+                updateDragClonePosition(x, y);
+                
+                // 原始元素變透明
+                element.classList.add('opacity-50');
+            }
+            
+            // 更新拖曳克隆元素的位置
+            function updateDragClonePosition(x, y) {
+                if (dragClone) {
+                    dragClone.style.left = x + 'px';
+                    dragClone.style.top = y + 'px';
+                }
+            }
+            
+            // 移除拖曳克隆元素
+            function removeDragClone() {
+                if (dragClone) {
+                    dragClone.remove();
+                    dragClone = null;
+                }
+                
+                // 恢復原始元素透明度
+                if (draggedElement) {
+                    draggedElement.classList.remove('opacity-50');
+                }
+                
+                // 移除所有高亮顯示
+                const dropZones = document.querySelectorAll('.droppable');
+                dropZones.forEach(zone => {
+                    zone.classList.remove('highlight');
+                });
+            }
+            
+            // 高亮顯示可放置區域
+            function highlightDropZone(element) {
+                // 移除所有高亮顯示
+                const dropZones = document.querySelectorAll('.droppable');
+                dropZones.forEach(zone => {
+                    zone.classList.remove('highlight');
+                });
+                
+                // 檢查元素是否是可放置區域或其子元素
+                let dropZone = null;
+                if (element) {
+                    if (element.classList.contains('droppable')) {
+                        dropZone = element;
+                    } else {
+                        // 查找父元素
+                        let parent = element.parentElement;
+                        while (parent) {
+                            if (parent.classList.contains('droppable')) {
+                                dropZone = parent;
+                                break;
+                            }
+                            parent = parent.parentElement;
+                        }
+                    }
+                }
+                
+                // 如果找到可放置區域，並且類型匹配，則高亮顯示
+                if (dropZone && draggedElement && dropZone.dataset.type === draggedElement.dataset.type) {
+                    dropZone.classList.add('highlight');
+                }
+            }
+            
+            // 處理放置
+            function handleDrop(element) {
+                // 檢查元素是否是可放置區域或其子元素
+                let dropZone = null;
+                if (element) {
+                    if (element.classList.contains('droppable')) {
+                        dropZone = element;
+                    } else {
+                        // 查找父元素
+                        let parent = element.parentElement;
+                        while (parent) {
+                            if (parent.classList.contains('droppable')) {
+                                dropZone = parent;
+                                break;
+                            }
+                            parent = parent.parentElement;
+                        }
+                    }
+                }
+                
+                // 如果找到可放置區域，並且類型匹配，則放置元素
+                if (dropZone && draggedElement && dropZone.dataset.type === draggedElement.dataset.type) {
+                    // 清空放置區
+                    dropZone.innerHTML = '';
+                    
+                    // 複製元素到放置區
+                    const clone = draggedElement.cloneNode(true);
+                    clone.classList.remove('draggable', 'opacity-50');
+                    clone.removeAttribute('draggable');
+                    dropZone.appendChild(clone);
+                    
+                    // 從選項區移除
+                    draggedElement.remove();
+                    
+                    // 檢查是否正確
+                    if (clone.dataset.correct === 'true') {
+                        dropZone.classList.add('correct');
+                    } else {
+                        dropZone.classList.add('incorrect');
+                    }
+                    
+                    // 檢查是否完成
+                    checkCompletion();
+                }
+            }
+            
+            // 檢查是否完成
+            function checkCompletion() {
+                const dropZones = document.querySelectorAll('.droppable');
+                let allFilled = true;
+                let allCorrect = true;
+                
+                dropZones.forEach(zone => {
+                    if (zone.children.length === 0) {
+                        allFilled = false;
+                    } else if (!zone.classList.contains('correct')) {
+                        allCorrect = false;
+                    }
+                });
+                
+                if (allFilled) {
+                    if (allCorrect) {
+                        // 添加到已完成列表
+                        if (!completedEcosystems.includes(currentEcosystem)) {
+                            completedEcosystems.push(currentEcosystem);
+                            
+                            // 更新完成標記
+                            updateCompletedBadge(currentEcosystem);
+                            
+                            // 更新進度計數
+                            updateProgressCount();
+                        }
+                        
+                        // 顯示成功訊息
+                        showResultModal(true);
+                        createConfetti();
+                        
+                        // 檢查是否全部完成
+                        if (completedEcosystems.length === Object.keys(ecosystemData).length) {
+                            // 停止計時器
+                            stopTimer();
+                            
+                            // 顯示完成模態框
+                            setTimeout(() => {
+                                hideResultModal();
+                                showCompleteModal();
+                            }, 1500);
+                        }
+                    } else {
+                        // 顯示失敗訊息
+                        showResultModal(false);
+                    }
+                }
+            }
+            
+            // 更新完成標記
+            function updateCompletedBadge(ecosystemId) {
+                const ecosystemCard = document.querySelector(`.ecosystem-card[data-id="${ecosystemId}"]`);
+                const badge = ecosystemCard.querySelector('.completed-badge');
+                badge.classList.remove('hidden');
+            }
+            
+            // 更新進度計數
+            function updateProgressCount() {
+                document.getElementById('progress-count').textContent = completedEcosystems.length;
+            }
+            
+            // 顯示結果模態框
+            function showResultModal(success) {
+                const resultModal = document.getElementById('result-modal');
+                const resultTitle = document.getElementById('result-title');
+                const resultMessage = document.getElementById('result-message');
+                
+                if (success) {
+                    resultTitle.textContent = '恭喜！';
+                    resultMessage.textContent = `你已成功完成「${ecosystemData[currentEcosystem].name}」的配對！`;
+                    document.getElementById('next-ecosystem-btn').style.display = 'block';
+                } else {
+                    resultTitle.textContent = '再試一次！';
+                    resultMessage.textContent = '有些配對不正確，請再嘗試。';
+                    document.getElementById('next-ecosystem-btn').style.display = 'none';
+                }
+                
+                resultModal.classList.remove('hidden');
+            }
+            
+            // 隱藏結果模態框
+            function hideResultModal() {
+                document.getElementById('result-modal').classList.add('hidden');
+            }
+            
+            // 顯示完成模態框
+            function showCompleteModal() {
+                const completeModal = document.getElementById('complete-modal');
+                document.getElementById('final-time').textContent = formatTime(totalTime);
+                completeModal.classList.remove('hidden');
+            }
+            
+            // 隱藏完成模態框
+            function hideCompleteModal() {
+                document.getElementById('complete-modal').classList.add('hidden');
+            }
+            
+            // 選擇下一個生態系統
+            function selectNextEcosystem() {
+                const ecosystemIds = Object.keys(ecosystemData);
+                const remainingEcosystems = ecosystemIds.filter(id => !completedEcosystems.includes(id));
+                
+                if (remainingEcosystems.length > 0) {
+                    // 隨機選擇一個未完成的生態系統
+                    const nextEcosystem = remainingEcosystems[Math.floor(Math.random() * remainingEcosystems.length)];
+                    selectEcosystem(nextEcosystem);
+                } else {
+                    // 所有生態系統都已完成
+                    stopTimer();
+                    hideResultModal();
+                    showCompleteModal();
+                }
+            }
+            
+            // 顯示資訊模態框
+            function showInfoModal() {
+                const infoModal = document.getElementById('info-modal');
+                const infoContent = document.getElementById('info-content');
+                
+                infoContent.innerHTML = '';
+                
+                // 創建所有生態系統的資訊卡
+                Object.keys(ecosystemData).forEach(ecosystemId => {
+                    const ecosystem = ecosystemData[ecosystemId];
+                    
+                    const card = document.createElement('div');
+                    card.className = 'info-card bg-white rounded-lg shadow p-4 border-l-4 border-blue-500';
+                    
+                    card.innerHTML = `
+                        <h3 class="font-bold text-lg text-blue-900 mb-2">${ecosystem.name}</h3>
+                        <div class="text-sm">
+                            <div class="mb-2">
+                                <span class="font-semibold text-blue-800">環境條件：</span>
+                                <p>${ecosystem.environment.text.replace(/<br>/g, ' ')}</p>
+                            </div>
+                            <div class="mb-2">
+                                <span class="font-semibold text-green-800">生產者：</span>
+                                <p>${ecosystem.producer.text.replace(/<br>/g, ' ')}</p>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-amber-800">消費者：</span>
+                                <p>${ecosystem.consumer.text.replace(/<br>/g, ' ')}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    infoContent.appendChild(card);
+                });
+                
+                infoModal.classList.remove('hidden');
+            }
+            
+            // 隱藏資訊模態框
+            function hideInfoModal() {
+                document.getElementById('info-modal').classList.add('hidden');
+            }
+            
+            // 創建慶祝效果
+            function createConfetti() {
+                const confettiCount = 100;
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    confetti.style.opacity = Math.random() + 0.5;
+                    confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    // 動畫結束後移除
+                    confetti.addEventListener('animationend', function() {
+                        this.remove();
+                    });
+                }
+            }
+            
+            // 開始計時器（如果尚未開始）
+            function startTimerIfNeeded() {
+                if (!timerStarted) {
+                    timerStarted = true;
+                    startTime = Date.now();
+                    
+                    // 更新計時器顯示
+                    timerInterval = setInterval(updateTimer, 1000);
+                }
+            }
+            
+            // 更新計時器
+            function updateTimer() {
+                const currentTime = Date.now();
+                totalTime = Math.floor((currentTime - startTime) / 1000);
+                document.getElementById('timer').textContent = formatTime(totalTime);
+            }
+            
+            // 停止計時器
+            function stopTimer() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+            }
+            
+            // 格式化時間（秒 -> mm:ss）
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+            
+            // 重置遊戲
+            function resetGame() {
+                // 重置計時器
+                stopTimer();
+                timerStarted = false;
+                totalTime = 0;
+                document.getElementById('timer').textContent = '00:00';
+                
+                // 重置完成列表
+                completedEcosystems = [];
+                
+                // 重置進度計數
+                document.getElementById('progress-count').textContent = '0';
+                
+                // 重置完成標記
+                document.querySelectorAll('.completed-badge').forEach(badge => {
+                    badge.classList.add('hidden');
+                });
+                
+                // 選擇第一個生態系統
+                selectEcosystem('upstream');
+            }
+            
+            // 默認選擇第一個生態系統
+            selectEcosystem('upstream');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'948bfa2b069f4a69',t:'MTc0ODc1MjI0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
