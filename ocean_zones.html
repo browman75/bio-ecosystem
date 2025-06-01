@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>海洋分區拖拉學習</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #e0f7fa;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    h1 {
+      color: #00796b;
+      margin-top: 20px;
+    }
+
+    .main {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 30px;
+      margin: 30px;
+      flex-wrap: wrap;
+    }
+
+    .image-box img {
+      width: 480px;
+      max-width: 100%;
+      border: 3px solid #0097a7;
+      border-radius: 12px;
+    }
+
+    .game-box {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 300px;
+    }
+
+    .labels {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .label {
+      padding: 10px;
+      background-color: #4dd0e1;
+      color: white;
+      border-radius: 8px;
+      cursor: grab;
+      font-weight: bold;
+    }
+
+    .dropzones {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .dropzone {
+      width: 100%;
+      height: 60px;
+      border: 2px dashed #00796b;
+      border-radius: 8px;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .correct {
+      background-color: #a5d6a7 !important;
+    }
+
+    .wrong {
+      background-color: #ef9a9a !important;
+    }
+
+    .instruction {
+      font-size: 1.1em;
+      margin-top: 10px;
+      color: #006064;
+    }
+  </style>
+</head>
+<body>
+  <h1>海洋分區拖拉學習</h1>
+  <p class="instruction">請根據圖片，將「潮間帶、近海區、大洋區上層、大洋區下層」拖曳到正確的區域名稱框中</p>
+
+  <div class="main">
+    <!-- 圖片區 -->
+    <div class="image-box">
+      <img src="ocean_zones.png" alt="海洋分區圖">
+    </div>
+
+    <!-- 拖曳互動區 -->
+    <div class="game-box">
+      <div class="labels">
+        <div class="label" draggable="true" id="label1">潮間帶</div>
+        <div class="label" draggable="true" id="label2">近海區</div>
+        <div class="label" draggable="true" id="label3">大洋區上層</div>
+        <div class="label" draggable="true" id="label4">大洋區下層</div>
+      </div>
+
+      <div class="dropzones">
+        <div class="dropzone" data-answer="潮間帶">區域 A</div>
+        <div class="dropzone" data-answer="近海區">區域 B</div>
+        <div class="dropzone" data-answer="大洋區上層">區域 C</div>
+        <div class="dropzone" data-answer="大洋區下層">區域 D</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const labels = document.querySelectorAll('.label');
+    const dropzones = document.querySelectorAll('.dropzone');
+
+    labels.forEach(label => {
+      label.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', label.textContent);
+      });
+    });
+
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        zone.style.backgroundColor = '#c8e6c9';
+      });
+
+      zone.addEventListener('dragleave', e => {
+        zone.style.backgroundColor = '';
+      });
+
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('text/plain');
+        if (data === zone.dataset.answer) {
+          zone.textContent = data;
+          zone.classList.remove('wrong');
+          zone.classList.add('correct');
+        } else {
+          zone.textContent = data;
+          zone.classList.remove('correct');
+          zone.classList.add('wrong');
+        }
+        zone.style.backgroundColor = '';
+      });
+    });
+  </script>
+
+  <div style="text-align: center; margin-top: 50px;">
+      <a href="index.html" style="
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #4db6ac;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 16px;
+        ">🔙 返回首頁</a>
+  </div>
+</body>
+</html>
