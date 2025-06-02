@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>水域生態系小測驗</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0f8ff;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .question {
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    }
+    .question h3 {
+      margin-top: 0;
+    }
+    .options label {
+      display: block;
+      margin: 0.4rem 0;
+    }
+    .btn {
+      background: #00796b;
+      color: white;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+      margin: 1.5rem auto;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>水域生態系小測驗</h1>
+  <form id="quizForm"></form>
+  <button class="btn" onclick="checkAnswers()">檢查答案</button>
+  <div class="result" id="result"></div>
+  <button class="btn" onclick="location.href='index.html'">返回首頁</button>
+
+  <script>
+    const questions = [
+      { type: 'mc', q: '哪一項是淡水生態系的一種？', options: ['潮間帶', '湖泊', '珊瑚礁', '大洋區'], answer: '湖泊' },
+      { type: 'tf', q: '潮間帶的陽光不足，導致生產者稀少。', options: ['正確', '錯誤'], answer: '錯誤' },
+      { type: 'mc', q: '河口常見哪一種植物？', options: ['海帶', '紫菜', '紅樹林（水筆仔）', '昆布'], answer: '紅樹林（水筆仔）' },
+      { type: 'mc', q: '文蛤如何適應高鹽度環境？', options: ['增加游動速度', '釋放毒素', '緊閉外殼', '改變顏色'], answer: '緊閉外殼' },
+      { type: 'tf', q: '紅樹林植物會釋放毒素防禦敵人。', options: ['正確', '錯誤'], answer: '錯誤' },
+      { type: 'mc', q: '哪個區域是浮游藻類最主要的生長地？', options: ['深海區底部', '河口底泥', '大洋上層透光區', '湖泊底部'], answer: '大洋上層透光區' },
+      { type: 'mc', q: '哪一項不會出現在紅樹林環境中？', options: ['水筆仔', '沙蠶', '鯨豚', '螃蟹'], answer: '鯨豚' },
+      { type: 'tf', q: '河川上游通常比下游汙染程度低。', options: ['正確', '錯誤'], answer: '正確' },
+      { type: 'mc', q: '河川上游的水流特徵為何？', options: ['水量大、汙染高', '水量小、流速快', '水量大、流速慢', '含氧量低'], answer: '水量小、流速快' },
+      { type: 'tf', q: '大洋深處沒有陽光，無任何生物能生存。', options: ['正確', '錯誤'], answer: '錯誤' }
+    ];
+
+    questions.sort(() => 0.5 - Math.random());
+
+    const form = document.getElementById('quizForm');
+    questions.forEach((q, index) => {
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.innerHTML = `<h3>第 ${index + 1} 題</h3><p>${q.q}</p>`;
+      const optionsDiv = document.createElement('div');
+      optionsDiv.className = 'options';
+      q.options.forEach(opt => {
+        const id = `q${index}_${opt}`;
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="radio" name="q${index}" value="${opt}" id="${id}"> ${opt}`;
+        optionsDiv.appendChild(label);
+      });
+      div.appendChild(optionsDiv);
+      form.appendChild(div);
+    });
+
+    function checkAnswers() {
+      let score = 0;
+      questions.forEach((q, i) => {
+        const radios = document.getElementsByName(`q${i}`);
+        let answered = false;
+        radios.forEach(r => {
+          const label = r.parentElement;
+          label.style.color = 'initial';
+          if (r.checked) {
+            answered = true;
+            if (r.value === q.answer) {
+              score++;
+              label.style.color = 'green';
+            } else {
+              label.style.color = 'red';
+            }
+          } else if (r.value === q.answer) {
+            label.style.color = 'green';
+          }
+        });
+      });
+      document.getElementById('result').innerText = `你答對了 ${score} / ${questions.length} 題。`;
+    }
+  </script>
+</body>
+</html>
