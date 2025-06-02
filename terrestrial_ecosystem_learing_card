@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>陸域生態系卡片</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #eef2f3;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .card-container {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      padding: 1.5rem;
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card h2 {
+      margin-top: 0;
+      color: #2a5d3d;
+    }
+    .details {
+      display: none;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+    .card.active .details {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>陸域生態系</h1>
+  <div class="card-container">
+    <div class="card" onclick="toggleCard(this)">
+      <h2>寒帶針葉林</h2>
+      <div class="details">
+        <p><strong>氣候：</strong>寒冷、雨量較少</p>
+        <p><strong>地理：</strong>高緯度或高海拔</p>
+        <p><strong>植物：</strong>裸子植物為主</p>
+        <p><strong>動物：</strong>熊、鹿等大型哺乳類</p>
+      </div>
+    </div>
+
+    <div class="card" onclick="toggleCard(this)">
+      <h2>溫帶落葉林</h2>
+      <div class="details">
+        <p><strong>氣候：</strong>四季分明</p>
+        <p><strong>地理：</strong>中緯度或中海拔</p>
+        <p><strong>植物：</strong>秋冬落葉、種類繁多</p>
+        <p><strong>動物：</strong>鳥類、哺乳類、昆蟲</p>
+      </div>
+    </div>
+
+    <div class="card" onclick="toggleCard(this)">
+      <h2>常綠闊葉林</h2>
+      <div class="details">
+        <p><strong>氣候：</strong>溫暖濕潤</p>
+        <p><strong>地理：</strong>低緯度或低海拔</p>
+        <p><strong>植物：</strong>全年常綠、葉大</p>
+        <p><strong>動物：</strong>熱帶鳥類、昆蟲、多樣性高</p>
+      </div>
+    </div>
+
+    <div class="card" onclick="toggleCard(this)">
+      <h2>草原生態系</h2>
+      <div class="details">
+        <p><strong>氣候：</strong>雨量較少，通常年雨量介於250~750mm</p>
+        <p><strong>地理：</strong>地形平坦</p>
+        <p><strong>植物：</strong>草本植物為主</p>
+        <p><strong>動物：</strong>善於奔跑或躲藏</p>
+      </div>
+    </div>
+
+    <div class="card" onclick="toggleCard(this)">
+      <h2>沙漠生態系</h2>
+      <div class="details">
+        <p><strong>氣候：</strong>雨量較少，通常年雨量少於250mm</p>
+        <p><strong>地理：</strong>地形平坦</p>
+        <p><strong>植物：</strong>草本植物為主</p>
+        <p><strong>動物：</strong>善於奔跑或躲藏</p>
+      </div>
+    </div>
+
+    <div class="card" onclick="toggleCard(this)">
+      <h2>凍原生態系</h2>
+      <div class="details">
+        <p><strong>氣候：</strong>溫度低</p>
+        <p><strong>地理：</strong>高緯度或高海拔</p>
+        <p><strong>植物：</strong>地衣、蘚苔、草本植物、灌木等</p>
+        <p><strong>動物：</strong>抗寒冷的生物，如北極熊</p>
+      </div>
+    </div>
+    
+  </div>
+
+  <script>
+    function toggleCard(card) {
+      card.classList.toggle("active");
+    }
+  </script>
+</body>
+</html>
