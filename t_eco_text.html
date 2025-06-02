@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>陸域生態系填空學習</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f0f8ff;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .block {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+      line-height: 2;
+    }
+    select {
+      font-size: 1rem;
+      padding: 0.2rem 0.5rem;
+      margin: 0 0.2rem;
+    }
+    .block button {
+      margin-top: 1rem;
+      background-color: #388e3c;
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .main-button {
+      display: block;
+      margin: 1rem auto;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      background-color: #2a5d3d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>陸域生態系填空學習</h1>
+
+  <div class="block" data-ids="q1,q2">
+    陸域生態系可按照
+    <select id="q1">
+      <option value="">請選擇</option>
+      <option value="溫度">溫度</option>
+      <option value="海拔">海拔</option>
+      <option value="鹽度">鹽度</option>
+    </select>
+    與
+    <select id="q2">
+      <option value="">請選擇</option>
+      <option value="雨量">雨量</option>
+      <option value="光照">光照</option>
+      <option value="氣壓">氣壓</option>
+    </select>
+    的差異區分。
+    <button onclick="checkBlock(this)">檢查本段</button>
+    <div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q3,q4,q5,q6">
+    凍原生態系的形成原因則是
+    <select id="q3">
+      <option value="">請選擇</option>
+      <option value="溫度">溫度</option>
+      <option value="雨量">雨量</option>
+    </select>
+    的因素大於
+    <select id="q4">
+      <option value="">請選擇</option>
+      <option value="雨量">雨量</option>
+      <option value="溫度">溫度</option>
+    </select>
+    ，主要生產者以
+    <select id="q5">
+      <option value="">請選擇</option>
+      <option value="蘚苔、地衣、草、灌木">蘚苔、地衣、草、灌木</option>
+      <option value="蕨類、裸子植物">蕨類、裸子植物</option>
+      <option value="被子植物">被子植物</option>
+    </select>
+    為主，消費者的種類則較少，如
+    <select id="q6">
+      <option value="">請選擇</option>
+      <option value="企鵝">企鵝</option>
+      <option value="北極熊">北極熊</option>
+    </select>
+    。
+    <button onclick="checkBlock(this)">檢查本段</button>
+    <div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q14,q7,q8,q9">
+    森林生態系年雨量平均約在
+    <select id="q14">
+      <option value="">請選擇</option>
+      <option value="750毫米以上">750毫米以上</option>
+      <option value="草原和沙漠之間">草原和沙漠之間</option>
+      <option value="少於250毫米">少於250毫米</option>
+    </select>
+    ，依氣候可細分為：
+    <select id="q7">
+      <option value="">請選擇</option>
+      <option value="針葉林">針葉林</option>
+      <option value="落葉闊葉林">落葉闊葉林</option>
+      <option value="常綠闊葉林">常綠闊葉林</option>
+    </select>（寒冷雨少）、
+    <select id="q8">
+      <option value="">請選擇</option>
+      <option value="針葉林">針葉林</option>
+      <option value="落葉闊葉林">落葉闊葉林</option>
+      <option value="常綠闊葉林">常綠闊葉林</option>
+    </select>（四季分明）、
+    <select id="q9">
+      <option value="">請選擇</option>
+      <option value="針葉林">針葉林</option>
+      <option value="落葉闊葉林">落葉闊葉林</option>
+      <option value="常綠闊葉林">常綠闊葉林</option>
+    </select>（溫暖濕潤）。
+    <button onclick="checkBlock(this)">檢查本段</button>
+    <div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q15,q16,q17">
+    臺灣位於熱帶與亞熱帶交界處，有許多高山，在溫暖的低海拔區域有
+    <select id="q15">
+      <option value="">請選擇</option>
+      <option value="常綠闊葉林">常綠闊葉林</option>
+      <option value="落葉闊葉林與針葉林的混合林">落葉闊葉林與針葉林的混合林</option>
+      <option value="針葉林">針葉林</option>
+    </select>，中海拔有
+    <select id="q16">
+      <option value="">請選擇</option>
+      <option value="常綠闊葉林">常綠闊葉林</option>
+      <option value="落葉闊葉林與針葉林的混合林">落葉闊葉林與針葉林的混合林</option>
+      <option value="針葉林">針葉林</option>
+    </select>，高海拔則以
+    <select id="q17">
+      <option value="">請選擇</option>
+      <option value="常綠闊葉林">常綠闊葉林</option>
+      <option value="落葉闊葉林與針葉林的混合林">落葉闊葉林與針葉林的混合林</option>
+      <option value="針葉林">針葉林</option>
+    </select>為主。
+    <button onclick="checkBlock(this)">檢查本段</button>
+    <div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q10,q18,q19,q20,q11">
+    草原生態系雨量介於森林與沙漠之間，植物以
+    <select id="q10">
+      <option value="">請選擇</option>
+      <option value="草本植物">草本植物</option>
+      <option value="木本植物">木本植物</option>
+    </select>為主，大多動物擅長
+    <select id="q18">
+      <option value="">請選擇</option>
+      <option value="奔跑">奔跑</option>
+      <option value="飛行">飛行</option>
+    </select>，有些擅長
+    <select id="q19">
+      <option value="">請選擇</option>
+      <option value="躲藏">躲藏</option>
+      <option value="飛行">飛行</option>
+    </select>，例如
+    <select id="q20">
+      <option value="">請選擇</option>
+      <option value="疣豬">疣豬</option>
+      <option value="豹">豹</option>
+    </select>，也有如
+    <select id="q11">
+      <option value="">請選擇</option>
+      <option value="斑馬、長頸鹿、獅子">斑馬、長頸鹿、獅子</option>
+      <option value="熊、狼、老虎">熊、狼、老虎</option>
+    </select>。
+    <button onclick="checkBlock(this)">檢查本段</button>
+    <div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q21,q22,q23,q24,q25,q26,q27,q28">
+    沙漠生態系年雨量
+    <select id="q21">
+      <option value="">請選擇</option>
+      <option value="750毫米以上">750毫米以上</option>
+      <option value="草原和森林之間">草原和森林之間</option>
+      <option value="少於250毫米">少於250毫米</option>
+    </select>，蒸發速率遠
+    <select id="q22">
+      <option value="">請選擇</option>
+      <option value="大">大</option>
+      <option value="大">小</option>
+    </select>於降雨量，日夜溫差
+    <select id="q23">
+      <option value="">請選擇</option>
+      <option value="大">大</option>
+      <option value="大">小</option>
+    </select>，一年僅有
+    <select id="q24">
+      <option value="">請選擇</option>
+      <option value="幾次">幾次</option>
+      <option value="偶爾">偶爾</option>
+      <option value="經常">經常</option>
+      <option value="總是">總是</option>
+    </select>降雨。仙人掌根分布
+    <select id="q25">
+      <option value="">請選擇</option>
+      <option value="廣而淺">廣而淺</option>
+      <option value="廣而深">廣而深</option>
+      <option value="窄而淺">窄而淺</option>
+      <option value="窄而深">窄而深</option>
+    </select>，葉演化為
+    <select id="q26">
+      <option value="">請選擇</option>
+      <option value="大葉狀">大葉狀</option>
+      <option value="肥厚狀">肥厚狀</option>
+      <option value="針狀">針狀</option>
+    </select>以減少水分散失。消費者種類較
+    <select id="q27">
+      <option value="">請選擇</option>
+      <option value="多">多</option>
+      <option value="少">少</option>
+    </select>，但多有耐
+    <select id="q28">
+      <option value="">請選擇</option>
+      <option value="大水">大水</option>
+      <option value="乾旱">乾旱</option>
+    </select>能力。
+    <button onclick="checkBlock(this)">檢查本段</button>
+    <div class="result"></div>
+  </div>
+
+  <button class="main-button" onclick="location.href='index.html'">返回首頁</button>
+
+  <script>
+    const answers = {
+      q1: "溫度", q2: "雨量", q3: "溫度", q4: "雨量",
+      q5: "蘚苔、地衣、草、灌木", q6: "北極熊",
+      q7: "針葉林", q8: "落葉闊葉林", q9: "常綠闊葉林",
+      q10: "草本植物", q11: "斑馬、長頸鹿、獅子",
+      q14: "750毫米以上", q15: "常綠闊葉林",
+      q16: "落葉闊葉林與針葉林的混合林", q17: "針葉林",
+      q18: "奔跑", q19: "躲藏", q20: "疣豬",
+      q21: "少於250毫米", q22: "大", q23: "大",
+      q24: "幾次", q25: "廣而淺", q26: "針狀",
+      q27: "少", q28: "乾旱"
+    };
+
+    function checkBlock(btn) {
+      const block = btn.closest('.block');
+      const ids = block.getAttribute('data-ids').split(',');
+      let correct = 0;
+      let total = 0;
+      ids.forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        total++;
+        if (sel.value === answers[id]) {
+          sel.style.border = '2px solid green';
+          correct++;
+        } else {
+          sel.style.border = '2px solid red';
+        }
+      });
+      const result = block.querySelector('.result');
+      result.innerText = `本段答對 ${correct} / ${total} 題。`;
+    }
+  </script>
+</body>
+</html>
