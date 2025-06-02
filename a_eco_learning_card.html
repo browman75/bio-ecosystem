@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>水域生態系互動卡片</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #e0f7fa;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      justify-content: center;
+    }
+    .card {
+      perspective: 1000px;
+      width: 100%;
+      height: 320px;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      cursor: pointer;
+    }
+    .card:hover .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-sizing: border-box;
+    }
+    .card-front {
+      background-color: #0288d1;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .card-back {
+      background-color: #ffffff;
+      color: #333;
+      transform: rotateY(180deg);
+      text-align: left;
+      overflow-y: auto;
+    }
+    .card-back h3 {
+      margin-top: 0;
+      color: #00796b;
+    }
+      .main-button {
+      display: block;
+      margin: 2rem auto;
+      padding: 0.6rem 1.5rem;
+      font-size: 1rem;
+      background-color: #004d40;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>水域生態系互動卡片</h1>
+  <div class="cards">
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-front">湖泊 / 池塘</div>
+        <div class="card-back">
+          <h3>湖泊 / 池塘</h3>
+          <p>水域類型：靜止水域<br>
+          含氧量：中至高<br>
+          生產者：藻類（表層）、水生植物（淺岸）<br>
+          消費者：昆蟲、魚類、蝦、螺貝、兩生類、哺乳類</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-front">河川 / 溪流</div>
+        <div class="card-back">
+          <h3>河川 / 溪流</h3>
+          <p>水域類型：流動水域<br>
+          上游流速快、含氧量高、汙染低<br>
+          生產者：藻類、水生植物、岸邊植物<br>
+          消費者：昆蟲、貝類、魚、蛙、鳥、哺乳類</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-front">河口</div>
+        <div class="card-back">
+          <h3>河口</h3>
+          <p>鹽分與水位變化大，養分高但易聚集汙染物<br>
+          生產者：蘆葦、紅樹林（水筆仔）<br>
+          消費者：沙蠶、蝦、蟹、貝類、鳥類<br>
+          適應：胎生苗、支持根、彈塗魚泥灘行動</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-front">潮間帶</div>
+        <div class="card-back">
+          <h3>潮間帶</h3>
+          <p>位於滿潮與乾潮之間，陽光充足、潮汐顯著<br>
+          生產者：紫菜<br>
+          消費者：藤壺、螺、蟹等</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-front">近海區</div>
+        <div class="card-back">
+          <h3>近海區</h3>
+          <p>水深不到200公尺，位於大陸棚<br>
+          生產者：大型藻類（如昆布）<br>
+          消費者：魚類、海龜、海豚等</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-front">遠洋區</div>
+        <div class="card-back">
+          <h3>遠洋區</h3>
+          <p>上層有浮游藻類，下層深海區依賴沉落遺體<br>
+          生產者：浮游藻類、藻類<br>
+          消費者：魚、蝦、蟹、軟體動物、鯨豚等</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="main-button" onclick="location.href='index.html'">返回首頁</button>
+</body>
+</html>
