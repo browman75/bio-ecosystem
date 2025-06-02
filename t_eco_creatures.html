@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>陸域生態系配對練習</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f3f4f6;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    .match-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    .match-item {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 300px;
+      padding: 1rem;
+    }
+    .match-item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #ccc;
+    }
+    select {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    .button-bar {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      margin: 0 1rem;
+      border: none;
+      border-radius: 6px;
+      background: #1d5d3e;
+      color: white;
+      cursor: pointer;
+    }
+    .wrong {
+      color: red;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>陸域生態系生物配對練習</h1>
+  <div class="match-container" id="matchList">
+    <!-- 動態插入配對項目 -->
+  </div>
+
+  <div class="button-bar">
+    <button onclick="checkMatch()">檢查答案</button>
+    <button onclick="location.href='index.html'">返回首頁</button>
+  </div>
+
+  <script>
+    const data = [
+      { name: "北極熊", photo: "image/polar_bear.jpg", answer: "凍原" },
+      { name: "臺灣水鹿", photo: "image/taiwan_sambar.jpg", answer: "森林" },
+      { name: "五色鳥", photo: "image/barbet.jpg", answer: "森林" },
+      { name: "穿山甲", photo: "image/pangolin.jpg", answer: "森林" },
+      { name: "長頸鹿", photo: "image/giraffe.jpg", answer: "草原" },
+      { name: "斑馬", photo: "image/zebra.jpg", answer: "草原" },
+      { name: "獅子", photo: "image/lion.jpg", answer: "草原" },
+      { name: "疣豬", photo: "image/warthog.jpg", answer: "草原" },
+      { name: "鬣狗", photo: "image/hyena.jpg", answer: "草原" },
+      { name: "金合歡", photo: "image/acacia.jpg", answer: "草原" },
+      { name: "牛筋草", photo: "image/grass.jpg", answer: "草原" },
+      { name: "仙人掌", photo: "image/cactus.jpg", answer: "沙漠" },
+      { name: "駱駝", photo: "image/camel.jpg", answer: "沙漠" },
+      { name: "跳鼠", photo: "image/kangaroo_rat.jpg", answer: "沙漠" },
+      { name: "沐霧甲蟲", photo: "image/beetle.jpg", answer: "沙漠" },
+      { name: "沙漠玫瑰", photo: "image/desert_rose.jpg", answer: "沙漠" },
+      { name: "角響尾蛇", photo: "image/rattlesnake.jpg", answer: "沙漠" }
+    ];
+
+    const ecosystems = ["森林", "草原", "沙漠", "凍原"];
+
+    const container = document.getElementById("matchList");
+
+    data.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "match-item";
+      div.innerHTML = `
+        <img src="${item.photo}" alt="${item.name}" />
+        <h3>${item.name}</h3>
+        <select id="sel${index}">
+          <option value="">請選擇生態系</option>
+          ${ecosystems.map(e => `<option value="${e}">${e}</option>`).join('')}
+        </select>
+        <div class="wrong" id="wrong${index}"></div>
+      `;
+      container.appendChild(div);
+    });
+
+    function checkMatch() {
+      data.forEach((item, i) => {
+        const selected = document.getElementById(`sel${i}`).value;
+        const feedback = document.getElementById(`wrong${i}`);
+        if (selected === item.answer) {
+          feedback.innerText = "";
+        } else {
+          feedback.innerText = `❌ 正確答案是：${item.answer}`;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
