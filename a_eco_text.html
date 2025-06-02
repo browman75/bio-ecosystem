@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>水域生態系填空學習</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #e0f7fa;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .block {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      line-height: 2;
+    }
+    select {
+      font-size: 1rem;
+      padding: 0.2rem 0.5rem;
+      margin: 0 0.2rem;
+    }
+    .block button, .main-button {
+      margin-top: 1rem;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .main-button {
+      display: block;
+      margin: 1rem auto;
+      background-color: #004d40;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>水域生態系填空學習</h1>
+
+  <div class="block" data-ids="q1">
+    水域環境依<select id="q1">
+      <option value="">請選擇</option>
+      <option value="水量">水量</option>
+      <option value="鹽度">鹽度</option>
+      <option value="深度">深度</option>
+    </select>高低可分為淡水、河口與海洋生態系。
+    <button onclick="checkBlock(this)">檢查本段</button><div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q2,q3,q4,q5,q6,q7,q8,q9">
+    淡水生態系可細分為<select id="q2">
+      <option value="">請選擇</option>
+      <option value="靜止水域">靜止水域</option>
+      <option value="流動水域">流動水域</option>
+    </select>的湖泊、池塘，與<select id="q3">
+      <option value="">請選擇</option>
+      <option value="靜止水域">靜止水域</option>
+      <option value="流動水域">流動水域</option>
+    </select>的河川、溪流等。 湖泊或池塘水面上層的透光區有<select id="q4">
+      <option value="">請選擇</option>
+      <option value="藻類">藻類</option>
+      <option value="大型水生植物">大型水生植物</option>
+    </select>，較<select id="q5">
+      <option value="">請選擇</option>
+      <option value="淺">淺</option>
+      <option value="深">深</option>
+    </select>區域則有大型水生植物。消費者包括昆蟲、螺、蝦、蟹與<select id="q6">
+      <option value="">請選擇</option>
+      <option value="吳郭魚和草魚">吳郭魚和草魚</option>
+      <option value="海膽和海星">海膽和海星</option>
+    </select>。溪流生態系上游<select id="q7">
+      <option value="">請選擇</option>
+      <option value="氧氣">氧氣</option>
+      <option value="二氧化碳">二氧化碳</option>
+    </select>含量比下游<select id="q8">
+      <option value="">請選擇</option>
+      <option value="高">高</option>
+      <option value="低">低</option>
+    </select>，流速<select id="q9">
+      <option value="">請選擇</option>
+      <option value="快">快</option>
+      <option value="慢">慢</option>
+    </select>且汙染低。
+    <button onclick="checkBlock(this)">檢查本段</button><div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q10,q11,q12,q13,q14,q15,q16,q17">
+    河口生態系養分<select id="q10">
+      <option value="">請選擇</option>
+      <option value="多">多</option>
+      <option value="少">少</option>
+    </select>，但易沉積<select id="q11">
+      <option value="">請選擇</option>
+      <option value="氧氣">氧氣</option>
+      <option value="汙染物">汙染物</option>
+      <option value="鹽">鹽</option>
+    </select>，常見如<select id="q12">
+      <option value="">請選擇</option>
+      <option value="黃樹林生態系">黃樹林生態系</option>
+      <option value="紅樹林生態系">紅樹林生態系</option>
+      <option value="黑樹林生態系">黑樹林生態系</option> 
+    </select>。鹽度變化<select id="q13">
+      <option value="">請選擇</option>
+      <option value="大">大</option>
+      <option value="小">小</option>
+    </select>。文蛤會<select id="q14">
+      <option value="">請選擇</option>
+      <option value="緊閉外殼">緊閉外殼</option>
+      <option value="快速彈跳">快速彈跳</option>
+    </select>；彈塗魚在<select id="q15">
+      <option value="">請選擇</option>
+      <option value="岩石縫隙">岩石縫隙</option>
+      <option value="無水的沙坑">無水的沙坑</option>
+      <option value="少水的泥灘地">少水的泥灘地</option>
+    </select>活動；<select id="q16">
+      <option value="">請選擇</option>
+      <option value="水筆仔">水筆仔</option>
+      <option value="蘆葦">蘆葦</option>
+      <option value="海葡萄">海葡萄</option>
+    </select>具胎生苗與支持根。消費者以<select id="q17">
+      <option value="">請選擇</option>
+      <option value="剛死亡的新鮮生物">剛死亡的新鮮生物</option>
+      <option value="生物的遺體或其碎屑">生物的遺體或其碎屑</option>
+      <option value="活跳跳的生物">活跳跳的生物</option>
+    </select>為食。
+    <button onclick="checkBlock(this)">檢查本段</button><div class="result"></div>
+  </div>
+
+  <div class="block" data-ids="q18,q19,q20,q21,q22,q23,q24,q25,q26">
+    海洋生態系的潮間帶（<select id="q18">
+      <option value="">請選擇</option>
+      <option value="滿潮">滿潮</option>
+      <option value="漲潮">漲潮</option>
+    </select>與<select id="q19">
+      <option value="">請選擇</option>
+      <option value="乾潮">乾潮</option>
+      <option value="退潮">退潮</option>
+    </select>間）陽光充足、生物種類豐富。海洋生態系中，深度不到200公尺<select id="q20">
+      <option value="">請選擇</option>
+      <option value="淺海區">淺海區</option>
+      <option value="淺海區">潮間帶</option>
+      <option value="大洋區">大洋區</option>
+    </select>生物種類豐富，魚類、海豚、海龜等，底部地形為<select id="q21">
+      <option value="">請選擇</option>
+      <option value="大陸棚">大陸棚</option>
+      <option value="大陸坡">大陸坡</option>
+    </select>，陽光<select id="q22">
+      <option value="">請選擇</option>
+      <option value="可穿透">可穿透</option>
+      <option value="穿透一半">穿透一半</option>
+      <option value="不可穿透">不可穿透</option>
+    </select>。水深超過200公尺的<select id="q23">
+      <option value="">請選擇</option>
+      <option value="淺海區">淺海區</option>
+      <option value="淺海區">潮間帶</option>
+      <option value="大洋區">大洋區</option>
+    </select>，分成上層透光區及下層不透光區，上層透光區生產者主要為<select id="q24">
+      <option value="">請選擇</option>
+      <option value="浮游藻類">浮游藻類</option>
+      <option value="大型藻類">大型藻類</option>
+      <option value="大型植物">大型植物</option>
+    </select>。下層不透光區則因為無光，消費者以<select id="q25">
+      <option value="">請選擇</option>
+      <option value="沉落的生物遺體">沉落的生物遺體</option>
+      <option value="浮游藻類">浮游藻類</option>
+    </select>為食的魚、蝦、蟹和貝類。因此整個大洋區的主要生產者為<select id="q26">
+      <option value="">請選擇</option>
+      <option value="浮游藻類">浮游藻類</option>
+      <option value="大型藻類">大型藻類</option>
+      <option value="大型植物">大型植物</option>
+    </select>。
+    <button onclick="checkBlock(this)">檢查本段</button><div class="result"></div>
+  </div>
+
+  <script>
+    const answers = {
+      q1: "鹽度", q2: "靜止水域", q3: "流動水域",
+      q4: "藻類", q5: "淺", q6: "吳郭魚和草魚",
+      q7: "氧氣", q8: "高", q9: "快",
+      q10: "多", q11: "汙染物", q12: "紅樹林生態系",
+      q13: "大", q14: "緊閉外殼", q15: "少水的泥灘地", q16: "水筆仔",
+      q17: "生物的遺體或其碎屑", q18: "滿潮", q19: "乾潮",
+      q20: "淺海區", q21: "大陸棚", q22: "可穿透",
+      q23: "大洋區", q24: "浮游藻類",
+      q25: "沉落的生物遺體", q26: "藻類"
+    };
+
+    function checkBlock(btn) {
+      const block = btn.closest('.block');
+      const ids = block.getAttribute('data-ids').split(',');
+      let correct = 0;
+      let total = 0;
+      ids.forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        total++;
+        if (sel.value === answers[id]) {
+          sel.style.border = '2px solid green';
+          correct++;
+        } else {
+          sel.style.border = '2px solid red';
+        }
+      });
+      const result = block.querySelector('.result');
+      result.innerText = `本段答對 ${correct} / ${total} 題。`;
+    }
+  </script>
+</body>
+</html>
