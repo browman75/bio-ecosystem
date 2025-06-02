@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>水域生態系生物配對</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f0f8ff;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+    select {
+      margin-top: 0.5rem;
+      padding: 0.4rem;
+      font-size: 1rem;
+    }
+    .btn {
+      margin: 2rem auto 1rem;
+      display: block;
+      background-color: #00796b;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>水域生態系生物配對</h1>
+  <div class="container" id="quiz"></div>
+  <button class="btn" onclick="checkMatch()">檢查答案</button>
+  <div class="result" id="result"></div>
+  <button class="btn" onclick="location.href='index.html'">返回首頁</button>
+
+  <script>
+    const data = [
+      { name: '台灣萍蓬草', image: 'image/nuphar.jpg', answer: '湖泊/池塘' },
+      { name: '短腹幽蟌', image: 'image/damselfly.jpg', answer: '湖泊/池塘' },
+      { name: '草魚', image: 'image/grass_carp.jpg', answer: '湖泊/池塘' },
+      { name: '翠鳥', image: 'image/kingfisher.jpg', answer: '溪流/河川' },
+      { name: '蘚苔', image: 'image/moss.jpg', answer: '溪流/河川' },
+      { name: '溪哥', image: 'image/sucker_fish.jpg', answer: '溪流/河川' },
+      { name: '水筆仔', image: 'image/mangrove.jpg', answer: '河口' },
+      { name: '沙蠶', image: 'image/worm.jpg', answer: '河口' },
+      { name: '彈塗魚', image: 'image/mudskipper.jpg', answer: '河口' },
+      { name: '弧邊招潮蟹', image: 'image/fiddler_crab.jpg', answer: '河口' },
+      { name: '方蟹', image: 'image/box_crab.jpg', answer: '河口' },
+      { name: '龍王鯛', image: 'image/grouper.jpg', answer: '近海區' },
+      { name: '昆布', image: 'image/kelp.jpg', answer: '近海區' },
+      { name: '大翅鯨', image: 'image/humpback.jpg', answer: '遠洋區' },
+      { name: '大王具足蟲', image: 'image/isopod.jpg', answer: '遠洋區' }
+    ];
+
+    const areas = ['湖泊/池塘', '溪流/河川', '河口', '潮間帶', '近海區', '遠洋區'];
+
+    const quiz = document.getElementById('quiz');
+    data.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <div><strong>${item.name}</strong></div>
+        <select id="q${i}">
+          <option value="">請選擇</option>
+          ${areas.map(area => `<option value="${area}">${area}</option>`).join('')}
+        </select>
+      `;
+      quiz.appendChild(div);
+    });
+
+    function checkMatch() {
+      let correct = 0;
+      data.forEach((item, i) => {
+        const sel = document.getElementById(`q${i}`);
+        if (sel.value === item.answer) {
+          sel.style.border = '2px solid green';
+          correct++;
+        } else {
+          sel.style.border = '2px solid red';
+        }
+      });
+      document.getElementById('result').innerText = `配對正確：${correct} / ${data.length} 項`;
+    }
+  </script>
+</body>
+</html>
