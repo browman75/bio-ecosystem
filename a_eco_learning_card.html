@@ -32,7 +32,7 @@
       transform-style: preserve-3d;
       transition: transform 0.6s;
     }
-    .card:hover .card-inner {
+    .card.flipped .card-inner {
       transform: rotateY(180deg);
     }
     .card-front, .card-back {
@@ -140,5 +140,12 @@
   </div>
   <button class="main-button" onclick="location.href='index.html'">返回首頁</button>
 
+<script>
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+    });
+  });
+</script>
 </body>
 </html>
