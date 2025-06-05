@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>章魚科普互動小測驗</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #e0f7fa;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #006064;
+    }
+    .passage {
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .question {
+      background: #ffffff;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .question h3 {
+      margin-top: 0;
+    }
+    .question label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+    button {
+      background: #00796b;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: block;
+      margin: 2rem auto;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>章魚小知識互動測驗</h1>
+
+  <div class="passage">
+    <h2>章魚真的有三顆心嗎？</h2>
+    <p>章魚是一種生活在海洋中的神奇生物。牠們不只有八條靈活的腕足，還擁有三顆心臟：其中兩顆負責將血液送到鰓中進行氣體交換，另一顆則將血液輸送到全身。</p>
+    <p>章魚的血液呈藍色，這是因為它使用銅為基礎的血紅素來攜帶氧氣，與人類的含鐵血紅素不同。此外，章魚還具有驚人的偽裝能力、短期記憶與學習能力，被認為是海洋中最聰明的無脊椎動物之一。</p>
+  </div>
+
+  <form id="quizForm">
+    <div class="question">
+      <h3>1. 根據本文內容，章魚具有下列哪一項特徵？</h3>
+      <label><input type="radio" name="q1" value="A"> 體表有鱗片、以鰓呼吸</label>
+      <label><input type="radio" name="q1" value="B"> 三顆心臟與藍色血液</label>
+      <label><input type="radio" name="q1" value="C"> 分節身體與外骨骼</label>
+      <label><input type="radio" name="q1" value="D"> 能進行光合作用的血紅素</label>
+    </div>
+
+    <div class="question">
+      <h3>2. 章魚在生物分類上屬於哪一動物門？（請根據課本內容）</h3>
+      <label><input type="radio" name="q2" value="A"> 軟體動物門，身體柔軟，多數有殼或外套膜</label>
+      <label><input type="radio" name="q2" value="B"> 節肢動物門，身體有外骨骼、分節與關節足</label>
+      <label><input type="radio" name="q2" value="C"> 棘皮動物門，具輻射對稱與水管系統</label>
+      <label><input type="radio" name="q2" value="D"> 刺絲胞動物門，有觸手與刺細胞</label>
+    </div>
+
+    <div class="question">
+      <h3>3. 章魚雖然智力高超，但牠仍屬於無脊椎動物，判斷的依據是什麼？</h3>
+      <label><input type="radio" name="q3" value="A"> 沒有心臟和血管</label>
+      <label><input type="radio" name="q3" value="B"> 缺乏神經與感覺器官</label>
+      <label><input type="radio" name="q3" value="C"> 沒有脊椎骨等內骨骼結構</label>
+      <label><input type="radio" name="q3" value="D"> 以觸手行走而非四肢</label>
+    </div>
+
+    <button type="button" onclick="checkAnswers()">檢查答案</button>
+    <div class="result" id="result"></div>
+  <button type="button" onclick="resetQuiz()">重新作答</button>
+    <div class="result" id="result"></div>
+  </form>
+
+  <script>
+    const answers = {
+      q1: 'B',
+      q2: 'A',
+      q3: 'C'
+    };
+
+    function checkAnswers() {
+      const feedback = {
+        q1: '章魚有三顆心臟與藍色血液，這是章魚最具代表性的生理特徵。',
+        q2: '章魚屬於軟體動物門，具有柔軟的身體和外套膜。',
+        q3: '章魚雖然聰明，但因為沒有脊椎骨，所以屬於無脊椎動物。'
+      };
+
+      let score = 0;
+      let explanation = '';
+      for (let key in answers) {
+        const radios = document.getElementsByName(key);
+        let answered = false;
+        for (let radio of radios) {
+          if (radio.checked) {
+            answered = true;
+            if (radio.value === answers[key]) {
+              score++;
+            } else {
+              explanation += `❌ 第${key.slice(1)}題答錯：${feedback[key]}\n`;
+            }
+          }
+        }
+        if (!answered) {
+          explanation += `❌ 第${key.slice(1)}題未作答或錯誤：${feedback[key]}\n`;
+        }
+      }
+
+      const resultDiv = document.getElementById('result');
+      if (score === Object.keys(answers).length) {
+        resultDiv.innerHTML = `<p style='color: green; font-size: 1.3rem;'>🎉 太棒了！你全部答對了！</p>`;
+      } else {
+        resultDiv.innerHTML = `<p>你答對了 ${score} / ${Object.keys(answers).length} 題。</p><pre style='text-align: left; white-space: pre-wrap;'>${explanation}</pre>`;
+      }
+    }
+  
+    function resetQuiz() {
+      const form = document.getElementById('quizForm');
+      form.reset();
+      document.getElementById('result').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
