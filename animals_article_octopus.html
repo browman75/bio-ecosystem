@@ -56,6 +56,7 @@
   </style>
 </head>
 <body>
+  
   <h1>章魚小知識互動測驗</h1>
 
   <div class="passage">
@@ -63,7 +64,7 @@
     <p>章魚是一種生活在海洋中的神奇生物。牠們不只有八條靈活的腕足，還擁有三顆心臟：其中兩顆負責將血液送到鰓中進行氣體交換，另一顆則將血液輸送到全身。</p>
     <p>章魚的血液呈藍色，這是因為它使用銅為基礎的血紅素來攜帶氧氣，與人類的含鐵血紅素不同。此外，章魚還具有驚人的偽裝能力、短期記憶與學習能力，被認為是海洋中最聰明的無脊椎動物之一。</p>
   </div>
-
+  
   <div style="text-align:center; margin-bottom: 1.5rem;">
     <img src="https://scontent-tpe1-1.xx.fbcdn.net/v/t1.6435-9/40257435_2712858438739698_2217115719387054080_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=yFfviqC2j10Q7kNvwEJtQdb&_nc_oc=AdmzldBk4hFzkghrj2Gk69VmCQUX7Qk5wW0KBES541cbJzVnS9fDlgNOMyqg-HCnAq1G5hQbulI97o9BvLLKotgA&_nc_zt=23&_nc_ht=scontent-tpe1-1.xx&_nc_gid=Fk8f5eLEFHopuIqn-kIkTA&oh=00_AfMaN_mSxELfqYOhI9d92kJoRNintMYvTj7yLgmcKd-bFg&oe=6868D19C" alt="章魚圖片" style="max-width: 100%; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
     <p style="font-size: 0.9rem; color: #555; margin-top: 0.5rem;">圖片來源：《BBC知識》國際中文版的貼文</p>
@@ -98,7 +99,103 @@
     <div class="result" id="result"></div>
   <button type="button" onclick="resetQuiz()">重新作答</button>
     <div class="result" id="result"></div>
+
+  <hr style="margin: 3rem 0;">
+
+  <h1>脊椎動物素養閱讀測驗</h1>
+  <div class="passage">
+    <h2>動物也能爬高山？</h2>
+    <p>你知道嗎？有些脊椎動物住在比人類還難以到達的地方。例如喜馬拉雅山脈上的雪豹，牠們不只能耐寒，還能在稀薄的高山空氣中呼吸自如，靠的是牠們特化的肺與血液攜氧能力。</p>
+    <p>雪豹為了適應高海拔地區稀薄的空氣，發展出特別的肺部結構與血液特性。牠們擁有相對較大的肺容量，以及數量更多、表面積更大的肺泡，能有效增加氧氣的吸收效率；此外，雪豹的血液中含有較高濃度的血紅素與較多的紅血球，使每單位血液能攜帶更多氧氣，有助於維持身體組織在低氧環境中的正常運作。這些特徵使雪豹能在海拔3,000公尺以上的寒冷山區中自由活動。</p>
+    <p>脊椎動物包括哺乳類、鳥類、爬蟲類、兩生類與魚類。這些動物的共同特徵是有脊椎骨。雖然牠們生活環境各異，有的會飛、有的會游泳、有的能爬山，但都具有內骨骼結構，支持牠們的身體並保護重要器官。</p>
+  </div>
+    
+  <div style="text-align:center; margin-bottom: 1.5rem;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Irbis4.JPG" alt="雪豹照片" style="max-width: 100%; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    <p style="font-size: 0.9rem; color: #555; margin-top: 0.5rem;">圖片來源：維基百科：雪豹</p>
+  </div>
+  
+    <form id="quizForm2">
+    <div class="question">
+      <h3>1. 根據本文，雪豹能生活在高山主要依靠什麼？</h3>
+      <label><input type="radio" name="v1" value="A"> 厚實的皮毛</label>
+      <label><input type="radio" name="v1" value="B"> 強壯的四肢</label>
+      <label><input type="radio" name="v1" value="C"> 特化的肺與血液系統</label>
+      <label><input type="radio" name="v1" value="D"> 獨特的聲帶構造</label>
+    </div>
+
+    <div class="question">
+      <h3>2. 下列哪一項是脊椎動物的共同特徵？</h3>
+      <label><input type="radio" name="v2" value="A"> 有外骨骼</label>
+      <label><input type="radio" name="v2" value="B"> 有節肢與分節身體</label>
+      <label><input type="radio" name="v2" value="C"> 有脊椎骨與內骨骼</label>
+      <label><input type="radio" name="v2" value="D"> 都具有翅膀或鰭</label>
+    </div>
+
+    <div class="question">
+      <h3>3. 哪一種動物不屬於脊椎動物？</h3>
+      <label><input type="radio" name="v3" value="A"> 海馬</label>
+      <label><input type="radio" name="v3" value="B"> 青蛙</label>
+      <label><input type="radio" name="v3" value="C"> 蜘蛛</label>
+      <label><input type="radio" name="v3" value="D"> 鴿子</label>
+    </div>
+
+    <button type="button" onclick="checkVertebrateAnswers()">檢查答案</button>
+    <div class="result" id="result2"></div>
+    <button type="button" onclick="resetVertebrateQuiz()">重新作答</button>
   </form>
+
+  <script>
+    const vertebrateAnswers = {
+      v1: 'C',
+      v2: 'C',
+      v3: 'C'
+    };
+
+    const vertebrateFeedback = {
+      v1: '雪豹能在高海拔存活，靠的是肺部與血液的高效攜氧能力。',
+      v2: '所有脊椎動物皆有脊椎骨與內骨骼結構。',
+      v3: '蜘蛛為無脊椎動物，屬於節肢動物門。'
+    };
+
+    function checkVertebrateAnswers() {
+      let score = 0;
+      let explanation = '';
+      for (let key in vertebrateAnswers) {
+        const radios = document.getElementsByName(key);
+        let answered = false;
+        for (let radio of radios) {
+          if (radio.checked) {
+            answered = true;
+            if (radio.value === vertebrateAnswers[key]) {
+              score++;
+            } else {
+              explanation += `❌ 第${key.slice(1)}題答錯：${vertebrateFeedback[key]}
+`;
+            }
+          }
+        }
+        if (!answered) {
+          explanation += `❌ 第${key.slice(1)}題未作答或錯誤：${vertebrateFeedback[key]}
+`;
+        }
+      }
+
+      const resultDiv = document.getElementById('result2');
+      if (score === Object.keys(vertebrateAnswers).length) {
+        resultDiv.innerHTML = `<p style='color: green; font-size: 1.3rem;'>🎉 太棒了！你全部答對了！</p>`;
+      } else {
+        resultDiv.innerHTML = `<p>你答對了 ${score} / ${Object.keys(vertebrateAnswers).length} 題。</p><pre style='text-align: left; white-space: pre-wrap;'>${explanation}</pre>`;
+      }
+    }
+
+    function resetVertebrateQuiz() {
+      document.getElementById('quizForm2').reset();
+      document.getElementById('result2').innerHTML = '';
+    }
+  </script>
+
+$1
 
   <script>
     const answers = {
