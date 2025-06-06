@@ -17,15 +17,28 @@
     h2 {
       font-size: 1.5em;
       color: #00695c;
-      margin-top: 40px;
+      margin-top: 20px;
       margin-bottom: 20px;
     }
-    .section {
+
+    .section-container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 0 20px;
+    }
+
+    .section {
+      flex: 1 1 300px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       margin-bottom: 40px;
     }
+
     .section a {
       display: inline-block;
       margin: 10px;
@@ -34,12 +47,20 @@
       color: white;
       text-decoration: none;
       border-radius: 10px;
-      font-size: 1.2em;
-      width: 280px; /* 統一寬度 */
+      font-size: 1.1em;
+      width: 100%;
       transition: background-color 0.2s;
     }
+
     .section a:hover {
       background-color: #00796b;
+    }
+
+    @media (max-width: 768px) {
+      .section-container {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
@@ -47,32 +68,35 @@
 
   <h1>🌱 生態系學習選單</h1>
 
-  <div class="section">
-    <h2>陸域生態系</h2>
-    <a href="t_eco_text.html">陸域生態系課文填空</a>
-    <a href="t_eco_creatures.html">陸域生態系生物與生態系配對</a>
-    <a href="terrestrial_ecosystem_learing_card.html">陸域生態系學習卡(學習單)  </a>
-    <a href="terrestrial_eco_test.html">陸域生態系小測驗</a>
-    <a href="terrestrial_ecosystem.html">陸域生態系配對</a>
-    <a href="t_eco_article.html">陸域生態系閱讀測驗</a>
-  </div>
+  <div class="section-container">
 
-  <div class="section">
-    <h2>水域生態系</h2>
-    <a href="a_eco_text.html">水域生態系課文填空</a>
-    <a href="ocean_zones.html">海洋生態系地形分區配對</a>
-    <a href="a_eco_creatures.html">水域生態系生物與生態系配對</a>
-    <a href="a_eco_learning_card.html">水域生態系學習卡(學習單)</a>
-    <a href="a_eco_test.html">水域生態系小測驗</a>
-    <a href="aquatic ecosystem.html">水域生態系配對</a>
-  </div>
+    <div class="section">
+      <h2>陸域生態系</h2>
+      <a href="t_eco_text.html">陸域生態系課文填空</a>
+      <a href="t_eco_creatures.html">陸域生態系生物與生態系配對</a>
+      <a href="terrestrial_ecosystem_learing_card.html">陸域生態系學習卡(學習單)</a>
+      <a href="terrestrial_eco_test.html">陸域生態系小測驗</a>
+      <a href="terrestrial_ecosystem.html">陸域生態系配對</a>
+      <a href="t_eco_article.html">陸域生態系閱讀測驗</a>
+    </div>
 
-  <div class="section">
-    <h2>動物界</h2>
-    <a href="animals_review.html">動物界特徵與例子</a>
-    <a href="animals_article_octopus.html">動物界閱讀測驗</a>
+    <div class="section">
+      <h2>水域生態系</h2>
+      <a href="a_eco_text.html">水域生態系課文填空</a>
+      <a href="ocean_zones.html">海洋生態系地形分區配對</a>
+      <a href="a_eco_creatures.html">水域生態系生物與生態系配對</a>
+      <a href="a_eco_learning_card.html">水域生態系學習卡(學習單)</a>
+      <a href="a_eco_test.html">水域生態系小測驗</a>
+      <a href="aquatic ecosystem.html">水域生態系配對</a>
+    </div>
+
+    <div class="section">
+      <h2>動物界</h2>
+      <a href="animals_review.html">動物界特徵與例子</a>
+      <a href="animals_article_octopus.html">動物界閱讀測驗</a>
+    </div>
+
   </div>
-  
 
 </body>
 </html>
